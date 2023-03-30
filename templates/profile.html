@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" class="dark" style="color-scheme: dark;">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{url_for('static', filename='css/portfolio.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='css/home.css')}}">
+    <title>Profile of {{name}}</title>
+</head>
+    <body style="margin-top: 0%;">
+        <nav>
+            <div class="navbar">
+                <div class="container nav-container">
+                        <input class="checkbox" type="checkbox" name="" id="" />
+                        <div class="hamburger-lines">
+                            <span class="line line1"></span>
+                            <span class="line line2"></span>
+                            <span class="line line3"></span>
+                        </div>
+                    <div class="name">
+                        <h1>Portfolio</h1>
+                    </div>
+                    <div class="logo">
+                        <h2>ECO</h2>
+                    </div>
+                    <div class="menu-items">
+                        <li><a href="#">Deposit</a></li>
+                        <li><a href="#">Withdrawl</a></li>
+                        <li><a href="#">Loan</a></li>
+                        <li><a href="#">Statement</a></li>
+                        <li><a href="/">Logout</a></li>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <h2 class="info">{{name}} ({{id}})</h2>
+        
+        <table class="portfolio-table">
+            <thead>
+                <tr>
+                    <th>Coin</th>
+                    <th>Amount Owned</th>
+                    <th>Current Value</th>
+                </tr>
+            </thead>
+            <tbody id="coin-table">
+                <!-- Coins will be added dynamically using JavaScript -->
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th>Total Balance</th>
+                    <td colspan="2" id="total-balance"></td>
+                </tr>
+            </tfoot>
+        </table>
+        <script type="text/javascript" src="{{url_for('static', filename='portfolio.js')}}"></script>
+        <script type="text/javascript">
+            loadUserData("{{id}}")
+        </script>
+        
+    </body>
+</html>
