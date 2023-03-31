@@ -162,4 +162,3 @@ def signup():
             return redirect(url_for("views.login", username=username))
     else:
         return render_template("signup.html")
-
