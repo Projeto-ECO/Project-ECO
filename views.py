@@ -26,7 +26,6 @@ def get_json():
     return jsonify(coins)
 
 
-
 @views.route("/data/<id>")
 def get_data(id):
     data = get_json_data(id)
