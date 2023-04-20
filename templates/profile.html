@@ -29,7 +29,7 @@
                         <li><a href="#">Withdrawl</a></li>
                         <li><a href="#">Loan</a></li>
                         <li><a href="#">Statement</a></li>
-                        <li><a href="/">Logout</a></li>
+                        <li><a href="/" id="logout-button">Logout</a></li>
                     </div>
                 </div>
             </div>
@@ -58,6 +58,7 @@
         <script type="text/javascript">
             loadUserData("{{id}}")
         </script>
+        <script type="text/javascript" src="{{url_for('static', filename='logout.js')}}"></script>
         
     </body>
 </html>

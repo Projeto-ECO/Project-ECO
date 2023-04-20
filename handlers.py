@@ -3,6 +3,7 @@ import os
 import win32com.client as win32
 import pythoncom
 import random
+from flask import jsonify
 
 
 def send_email(to, subject, body):
@@ -11,14 +12,14 @@ def send_email(to, subject, body):
     email = outlook.CreateItem(0)
     email.To = to
     email.Subject = subject
-    email.SentOnBehalfOfName = "t.fonseca@ua.pt"  # add this line to set the "From" field
     email.HTMLBody = body
     email.Send()
     pythoncom.CoUninitialize()
     return True
 
-def send_two_factor_code(to, code):
-    send_email(to, "Two Factor Authentication Code",
+def send_two_factor_auth_code(to, code):
+    email = search_user_by_username(to)["email"]
+    send_email(email, "Two Factor Authentication Code",
         """
             <html>
             <head>
@@ -49,48 +50,52 @@ def send_two_factor_code(to, code):
     )
 
 
-def generate_two_factor_code():
+def generate_two_factor_auth_code():
     return str(random.randint(100000, 999999))
 
 
-def read_json():
+def read_json(filename):
     directory = os.getcwd()
-    if os.path.exists(directory+"/db_handler/users.json") is False:
-        write_json("db_handler/users.json", {"users": []})
+    if not os.path.exists(directory+filename) and filename == "\\db_handler\\users.json":
+        write_json(filename, {"users": []})
         data = None
     else:
-        with open("db_handler/users.json") as file:
+        with open(directory+filename) as file:
             data = json.load(file)
     return data
 
 
 def write_json(file, data):
-    with open(file, "w") as file:
+    directory = os.getcwd()
+    with open(directory+file, "w+") as file:
             json.dump(data, file, indent=4)
 
 
-def search_user(email):
-    data = read_json()
+def search_user_by_email(email):
+    data = read_json("\\db_handler\\users.json")
     if data is None:
         return None
     for user in data["users"]:
-        if user["email"] == email:
+        if user["email"] == str(email):
             return user
-    return None
 
 
 def search_user_by_username(username):
-    data = read_json()
+    data = read_json("\\db_handler\\users.json")
     if data is None:
         return None
-    for user in data["users"]:
+    for user in data.get("users"):
         if user["username"] == username:
             return user
     return None
 
 
 def validate_login(username, password):
-    user = search_user_by_username(username)
+    if ("@" in username):
+        user = search_user_by_email(username)
+    else:
+        user = search_user_by_username(username)
+
     if user is None:
         return False
     else:
@@ -101,7 +106,7 @@ def validate_login(username, password):
 
 
 def send_recovery_password(email):
-    user = search_user(email)
+    user = search_user_by_email(email)
     password = user["password"]
     name = user["name"]
     if user is None:
@@ -112,7 +117,6 @@ def send_recovery_password(email):
         email = outlook.CreateItem(0)
         email.To = user["email"]
         email.Subject = "Recover your password"
-        email.SentOnBehalfOfName = "t.fonseca@ua.pt"  # add this line to set the "From" field
         email.HTMLBody = """
                             <html>
                             <head>
@@ -142,15 +146,15 @@ def send_recovery_password(email):
         return True
 
 
-def random_id():
+def generate_random_id():
     random_id = random.randint(100000, 999999)
-    while check_id_exists(random_id):
+    while check_id_existence(random_id):
         random_id = random.randint(100000, 999999)
     return random_id
 
 
-def check_id_exists(id):
-    data = read_json()
+def check_id_existence(id):
+    data = read_json("\\db_handler\\users.json")
     if data is None:
         return False
     for user in data["users"]:
@@ -159,8 +163,8 @@ def check_id_exists(id):
     return False
 
 
-def get_id(username):
-    data = read_json()
+def get_id_by_username(username):
+    data = read_json("\\db_handler\\users.json")
     if data is None:
         return None
     for user in data["users"]:
@@ -168,7 +172,9 @@ def get_id(username):
             return user["id"]
     return None
 
-def get_json_data(id):
-    with open("accounts/"+id+".json") as ficheiro:
-        data = json.load(ficheiro)
-    return data
+
+def check_if_online(username):
+    data = read_json("\\db_handler\\users.json")
+    for user in data["users"]:
+        if user["username"] == username:
+            return user["active"]

@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, jsonify, redirect, url_for
+from flask import Blueprint, render_template, request, jsonify, redirect, url_for, session
 from handlers import *
 
 
@@ -12,24 +12,16 @@ def home():
 
 @views.route("/profile/<username>")
 def profile(username):
-    id = get_id(username)
-    return render_template("profile.html", name=username, id=id)
-
-
-@views.route("/json")
-def get_json():
-    coins = [
-        {"name": "Bitcoin", "value": 60000},
-        {"name": "Ethereum", "value": 2000},
-        {"name": "Litecoin", "value": 250},
-    ]
-    return jsonify(coins)
+    activity_status = check_if_online(username)
+    if activity_status == True:
+        return render_template("profile.html", name=username, id=get_id_by_username(username))
+    else:
+        return redirect(url_for("views.home"))
 
 
 @views.route("/data/<id>")
 def get_data(id):
-    data = get_json_data(id)
-    return jsonify(data)
+    return jsonify(read_json("/accounts/"+id+".json"))
 
 
 @views.route("/go-to-home")
@@ -37,26 +29,60 @@ def go_to_home():
     return redirect(url_for("views.home"))
 
 
+@views.route("/two-factor-auth-login/<username>", methods=["GET", "POST"])
+def two_factor_auth_login(username):
+    code = session.get("code")
+    data = read_json("\\db_handler\\users.json")
+    for user in data["users"]:
+        if user["username"] == username:
+            if user["active"] == True: # check if user is already authenticated
+                return redirect(url_for("views.profile", username=username))
+            else:
+                if request.method == "POST":
+                    entered_code = request.form.get("code")
+                    if entered_code == code:
+                        user["active"] = True
+                        write_json("\\db_handler\\users.json", data)
+                        session["username"] = username
+                        return redirect(url_for("views.profile", username=username))
+                return render_template("two-factor-auth-login.html", username=username)
+    return redirect(url_for("views.login"))
+
+
+
 @views.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        data = request.form
-        username = data.get("username")
-        password = data.get("password")
+        username = request.form.get("username")
+        password = request.form.get("password")
         if validate_login(username, password) is False:
             return render_template("login.html", message="User or password are incorrect.")
         else:
-            return redirect(url_for("views.profile", username=username))
+            if "@" in username:
+                username = search_user_by_email(username)["username"]
+            code = generate_two_factor_auth_code()
+            session["code"] = code
+            send_two_factor_auth_code(username, code)
+            return redirect(url_for("views.two_factor_auth_login", username = username))
     else:
         return render_template("login.html")
-    
+
+@views.route("/logout", methods=["POST"])
+def logout():
+    data = read_json("\\db_handler\\users.json")
+    for user in data["users"]:
+        if user["username"] == session.get("username"):
+            user["active"] = False
+            write_json("\\db_handler\\users.json", data)
+    session.clear()
+    return redirect(url_for("views.home"))
+
 
 @views.route("/recover-password", methods=["GET", "POST"])
 def recover_password():
     if request.method == "POST":
-        data = request.form
-        email = data.get("email")
-        user = search_user(email)
+        email = request.form.get("email")
+        user = search_user_by_email(email)
         if user is None:
             return redirect(url_for("views.signup"))
         else:
@@ -73,14 +99,14 @@ def signup():
         username = request.form.get("username")
         password = request.form.get("password")
         email = request.form.get("email")
-        if search_user(email) != None or search_user_by_username(username) != None:
+        if search_user_by_email(email) != None or search_user_by_username(username) != None:
             return render_template("signup.html", message="User already exists.")
         else:
-            id = str(random_id())
-            data = {"username": username, "password": password, "email": email, "id" : id}
-            dados = read_json()
-            dados["users"].append(data)
-            write_json("db_handler/users.json", dados)
+            id = str(generate_random_id())
+            data_to_add = {"username": username, "password": password, "email": email, "id" : id, "active" : False}
+            data = read_json("\\db_handler\\users.json")
+            data["users"].append(data_to_add)
+            write_json("\\db_handler\\users.json", data)
             json_coins = {
                             "coins": [
                                 {
@@ -157,7 +183,7 @@ def signup():
                                 "200.00": 0 
                             }
                         }
-            write_json("accounts/"+id+".json", json_coins)
+            write_json("\\accounts\\"+id+".json", json_coins)
             return redirect(url_for("views.login", username=username))
     else:
         return render_template("signup.html")

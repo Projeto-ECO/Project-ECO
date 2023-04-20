@@ -16,7 +16,7 @@
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='vendor/select2/select2.min.css') }}">
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='vendor/daterangepicker/daterangepicker.css') }}">
         <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/home.css')}}">
-        <title>Login</title>
+        <title>Authentication</title>
         <style>
             ::placeholder {
                 color: gray;
@@ -42,30 +42,19 @@
                     </div>
                     <form class="login100-form validate-form" method="post" style="text-align: left;">
                         <span class="login100-form-title p-b-49">
-                            Login
+                                Authentication
                         </span>
     
-                        <div class="wrap-input100 validate-input m-b-23" data-validate = "Username is required">
-                            <span class="label-input100">Username</span>
-                            <input class="input100" name="username" placeholder="Type your username or Email">
-                        </div>
-                        
-                        <div class="wrap-input100 validate-input" data-validate="Password is required">
-                            <span class="label-input100">Password</span>
-                            <input class="input100" type="password" name="password" placeholder="Type your password">
-                        </div>
-                        
-                        <div class="text-right p-t-8 p-b-31">
-                            <a href="recover-password" style="color: rgba(52,53,65);">
-                                Forgot password?
-                            </a>
+                        <div class="wrap-input100 validate-input m-b-23" data-validate = "Authentication Code is required">
+                            <span class="label-input100">Authentication Code</span>
+                            <input class="input100" name="code" placeholder="Type your Authentication Code">
                         </div>
                         
                         <div class="container-login100-form-btn">
                             <div class="wrap-login100-form-btn">
                                 <div class="login100-form-bgbtn"></div>
                                 <button class="login100-form-btn">
-                                    Login
+                                    Verify
                                 </button>
                             </div>
                         </div>
