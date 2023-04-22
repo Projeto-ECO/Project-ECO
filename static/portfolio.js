@@ -46,23 +46,24 @@ function loadUserData(id) {
 }
 
 var depositButton = document.getElementById("deposit-button");
-var modal = document.getElementById("deposit-modal");
-var closeButton = document.getElementsByClassName("close")[0];
+var modalDeposit = document.getElementById("deposit-modal");
+var closeButtonDeposit = document.getElementsByClassName("close")[0];
 
 depositButton.onclick = function() {
-    modal.style.display = "block";
+    modalDeposit.style.display = "block";
 }
 
-closeButton.onclick = function() {
-    modal.style.display = "none";
+closeButtonDeposit.onclick = function() {
+    modalDeposit.style.display = "none";
 }
 
 window.onclick = function(event) {
-    if (event.target == modal) {
-        modal.style.display = "none";
+    if (event.target == modalDeposit) {
+        modalDeposit.style.display = "none";
+    } else if (event.target == modalWithdrawl) {
+        modalWithdrawl.style.display = "none";
     }
 }
-
 
 $(function() {
     $('#deposit-form').submit(function(event) {
@@ -71,14 +72,55 @@ $(function() {
     
         // Get form data
         var formData = {
-            'coin': $('#coin').val(),
-            'amount': $('#amount').val()
+            'coin-deposit': $('#coin-deposit').val(),
+            'amount-deposit': $('#amount-deposit').val()
         };
     
         // Send AJAX request to server
         $.ajax({
             type: 'POST',
             url: '/deposit',
+            data: formData,
+            success: function(response) {
+                // Refresh the page
+                location.reload();
+            },
+            error: function(xhr, status, error) {
+                // Handle error response
+                location.reload();
+            }
+        });
+    });
+});
+
+
+var withdrawlButton = document.getElementById("withdrawl-button");
+var modalWithdrawl = document.getElementById("withdrawl-modal");
+var closeButtonWithdrawl = document.getElementsByClassName("close")[1];
+
+withdrawlButton.onclick = function() {
+    modalWithdrawl.style.display = "block";
+}
+
+closeButtonWithdrawl.onclick = function() {
+    modalWithdrawl.style.display = "none";
+}
+
+$(function() {
+    $('#withdrawl-form').submit(function(event) {
+        // Prevent default form submission behavior
+        event.preventDefault();
+    
+        // Get form data
+        var formData = {
+            'coin-withdrawl': $('#coin-withdrawl').val(),
+            'amount-withdrawl': $('#amount-withdrawl').val()
+        };
+    
+        // Send AJAX request to server
+        $.ajax({
+            type: 'POST',
+            url: '/withdrawl',
             data: formData,
             success: function(response) {
                 // Refresh the page

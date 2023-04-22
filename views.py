@@ -200,14 +200,29 @@ def signup():
 
 @views.route("/deposit", methods=["POST", "GET"])
 def deposit():
-    coin = request.form.get("coin")
-    amount = request.form.get("amount")
+    coin = request.form.get("coin-deposit")
+    amount = request.form.get("amount-deposit")
     amount = int(amount)
     coin = "{:.2f}".format(float(coin))
     data = read_json("\\accounts\\"+session.get("id")+".json")
     for coin_ in data["coins"]:
         if str(coin_["name"]) == str(coin):
             data["coinAmounts"][coin] = data["coinAmounts"][coin] + amount
+            write_json("\\accounts\\"+session.get("id")+".json", data)
+            return redirect(url_for("views.profile", username=session.get("username")))
+    return redirect(url_for("views.profile", username=session.get("username")))
+
+
+@views.route("/withdrawl", methods=["POST", "GET"])
+def withdrawl():
+    coin = request.form.get("coin-withdrawl")
+    amount = request.form.get("amount-withdrawl")
+    amount = int(amount)
+    coin = "{:.2f}".format(float(coin))
+    data = read_json("\\accounts\\"+session.get("id")+".json")
+    for coin_ in data["coins"]:
+        if str(coin_["name"]) == str(coin) and data["coinAmounts"][coin] >= amount and amount > 0:
+            data["coinAmounts"][coin] = data["coinAmounts"][coin] - amount
             write_json("\\accounts\\"+session.get("id")+".json", data)
             return redirect(url_for("views.profile", username=session.get("username")))
     return redirect(url_for("views.profile", username=session.get("username")))

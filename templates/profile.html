@@ -24,19 +24,6 @@
                     <div class="logo">
                         <h2>ECO</h2>
                     </div>
-                    <div class="modal">
-                        <div class="modal-content">
-                        <span class="close">&times;</span>
-                        <h2>Deposit</h2>
-                        <form action="">
-                            <label for="coin-input">Coin:</label>
-                            <input type="text" id="coin-input" name="coin-input" required>
-                            <label for="amount-input">Amount:</label>
-                            <input type="number" id="amount-input" name="amount-input" required>
-                            <input type="submit" value="Submit">
-                        </form>
-                        </div>
-                    </div>
                     <div class="menu-items">
                         <div class="container-profile-image">
                             <div class="profile">
@@ -51,7 +38,7 @@
                             <div class="menu-list">
                             <ul>
                                 <li><a id="deposit-button">Deposit</a></li>
-                                <li><a href="#">Withdrawl</a></li>
+                                <li><a id="withdrawl-button">Withdrawl</a></li>
                                 <li><a href="#">Loan</a></li>
                                 <li><a href="#">Statement</a></li>
                                 <li><a href="/" id="logout-button">Logout</a></li>
@@ -65,12 +52,34 @@
         <div id="deposit-modal" class="modal">
             <div class="modal-content">
                 <span class="close">&times;</span>
-                <h2>Deposit</h2>
+                <h2 style="color: rgb(77, 155, 75);">Deposit</h2>
                 <form id="deposit-form" method="POST">
-                    <label for="coin">Coin:</label>
-                        <input type="text" id="coin" name="coin" required>
-                    <label for="amount">Amount:</label>
-                        <input type="number" id="amount" name="amount" required>
+                    <label for="coin" style="color: rgb(77, 155, 75);">Coin:</label>
+                    <br>    
+                        <input type="text" id="coin-deposit" name="coin-deposit" required>
+                    <br>
+                    <label for="amount" style="color: rgb(77, 155, 75);">Amount:</label>
+                    <br>
+                        <input type="number" id="amount-deposit" name="amount-deposit" required>
+                    <br>
+                    <input type="submit" value="Submit">
+                </form>
+            </div>
+        </div>
+
+        <div id="withdrawl-modal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2 style="color: rgb(77, 155, 75);">Withdrawl</h2>
+                <form id="withdrawl-form" method="POST">
+                    <label for="coin" style="color: rgb(77, 155, 75);">Coin:</label>
+                    <br>
+                        <input type="text" id="coin-withdrawl" name="coin-withdrawl" required>
+                    <br>
+                    <label for="amount" style="color: rgb(77, 155, 75);">Amount:</label>
+                    <br>
+                        <input type="number" id="amount-withdrawl" name="amount-withdrawl" required>
+                    <br>
                     <input type="submit" value="Submit">
                 </form>
             </div>
