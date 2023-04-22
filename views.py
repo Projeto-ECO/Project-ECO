@@ -78,13 +78,11 @@ def login():
 
 @views.route("/logout", methods=["POST"])
 def logout():
-    data = read_json("\\db_handler\\users.json")
-    for user in data["users"]:
-        if user["username"] == session.get("username"):
-            user["active"] = False
-            write_json("\\db_handler\\users.json", data)
-    session.clear()
-    return redirect(url_for("views.home"))
+    if inactivate_user( session.get("id")):
+        session.clear()
+        return redirect(url_for("views.home"))
+    else:
+        return redirect(url_for("views.profile", username=session.get("username")))
 
 
 @views.route("/recover-password", methods=["GET", "POST"])
@@ -202,14 +200,7 @@ def signup():
 def deposit():
     coin = request.form.get("coin-deposit")
     amount = request.form.get("amount-deposit")
-    amount = int(amount)
-    coin = "{:.2f}".format(float(coin))
-    data = read_json("\\accounts\\"+session.get("id")+".json")
-    for coin_ in data["coins"]:
-        if str(coin_["name"]) == str(coin):
-            data["coinAmounts"][coin] = data["coinAmounts"][coin] + amount
-            write_json("\\accounts\\"+session.get("id")+".json", data)
-            return redirect(url_for("views.profile", username=session.get("username")))
+    banking_operations(session.get("id"), "deposit", coin, amount)
     return redirect(url_for("views.profile", username=session.get("username")))
 
 
@@ -217,12 +208,5 @@ def deposit():
 def withdrawl():
     coin = request.form.get("coin-withdrawl")
     amount = request.form.get("amount-withdrawl")
-    amount = int(amount)
-    coin = "{:.2f}".format(float(coin))
-    data = read_json("\\accounts\\"+session.get("id")+".json")
-    for coin_ in data["coins"]:
-        if str(coin_["name"]) == str(coin) and data["coinAmounts"][coin] >= amount and amount > 0:
-            data["coinAmounts"][coin] = data["coinAmounts"][coin] - amount
-            write_json("\\accounts\\"+session.get("id")+".json", data)
-            return redirect(url_for("views.profile", username=session.get("username")))
+    banking_operations(session.get("id"), "deposit", coin, amount)
     return redirect(url_for("views.profile", username=session.get("username")))

@@ -185,3 +185,44 @@ def check_image_existence(id):
         return False
     else:
         return True
+
+def banking_operations(id, operation,coin, amount):
+    data = read_json("\\db_handler\\users.json")
+    if data is None:
+        return None
+    amount = int(amount)
+    coin = "{:.2f}".format(float(coin))
+    data = read_json("\\accounts\\"+id+".json")
+    if operation == "deposit":
+        for coin_ in data["coins"]:
+            if str(coin_["name"]) == str(coin) and data["coinAmounts"][coin] >= amount and amount > 0:
+                data["coinAmounts"][coin] = data["coinAmounts"][coin] - amount
+                write_json("\\accounts\\"+id+".json", data)
+                return True
+    elif operation == "withdraw":
+        for coin_ in data["coins"]:
+            if str(coin_["name"]) == str(coin) and data["coinAmounts"][coin] >= amount and amount > 0:
+                data["coinAmounts"][coin] = data["coinAmounts"][coin] + amount
+                write_json("\\accounts\\"+id+".json", data)
+                return True
+    return False
+
+
+def inactivate_user(id):
+    data = read_json("\\db_handler\\users.json")
+    for user in data["users"]:
+        if user["id"] == id:
+            user["active"] = False
+            write_json("\\db_handler\\users.json", data)
+            return True
+    return False
+
+
+def activate_user(id):
+    data = read_json("\\db_handler\\users.json")
+    for user in data["users"]:
+        if user["id"] == id:
+            user["active"] = True
+            write_json("\\db_handler\\users.json", data)
+            return True
+    return False
