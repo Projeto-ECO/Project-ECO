@@ -195,3 +195,41 @@ h2.info {
 .nav-container input[type="checkbox"]:checked ~ .logo{
     display: none;
 }
+
+.container-profile-image {
+    margin: 0 auto; /* adiciona margem automática nas laterais */
+    display: flex;
+    align-items: top;
+    height: 100px;
+    margin-bottom: 100px;
+    order: 1;
+}
+
+.profile-img img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    align-items: top;
+    display: flex;
+    margin: 0 auto;
+}
+
+.menu-items {
+display: flex;
+flex-direction: column;
+}
+
+.menu-list {
+order: 2;
+}
+
+
+#deposit-modal {
+    color: #666666;
+}
+
+.flashes {
+    padding: 10px;
+    background-color: #f2f2f2;
+    border: 1px solid #ddd;
+}

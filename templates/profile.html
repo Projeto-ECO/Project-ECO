@@ -24,16 +24,60 @@
                     <div class="logo">
                         <h2>ECO</h2>
                     </div>
+                    <div class="modal">
+                        <div class="modal-content">
+                        <span class="close">&times;</span>
+                        <h2>Deposit</h2>
+                        <form action="">
+                            <label for="coin-input">Coin:</label>
+                            <input type="text" id="coin-input" name="coin-input" required>
+                            <label for="amount-input">Amount:</label>
+                            <input type="number" id="amount-input" name="amount-input" required>
+                            <input type="submit" value="Submit">
+                        </form>
+                        </div>
+                    </div>
                     <div class="menu-items">
-                        <li><a href="#">Deposit</a></li>
-                        <li><a href="#">Withdrawl</a></li>
-                        <li><a href="#">Loan</a></li>
-                        <li><a href="#">Statement</a></li>
-                        <li><a href="/" id="logout-button">Logout</a></li>
+                        <div class="container-profile-image">
+                            <div class="profile">
+                                <div class="profile-img">
+                                    <img src="{{url_for('static', filename='images/' + image_number + '.png')}}" alt="profile">
+                                </div>
+                                <div class="profile-name">
+                                <h2>{{name}}</h2>
+                                </div>
+                            </div>
+                            </div>
+                            <div class="menu-list">
+                            <ul>
+                                <li><a id="deposit-button">Deposit</a></li>
+                                <li><a href="#">Withdrawl</a></li>
+                                <li><a href="#">Loan</a></li>
+                                <li><a href="#">Statement</a></li>
+                                <li><a href="/" id="logout-button">Logout</a></li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
         </nav>
+
+        <div id="deposit-modal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Deposit</h2>
+                <form id="deposit-form" method="POST">
+                    <label for="coin">Coin:</label>
+                        <input type="text" id="coin" name="coin" required>
+                    <label for="amount">Amount:</label>
+                        <input type="number" id="amount" name="amount" required>
+                    <input type="submit" value="Submit">
+                </form>
+            </div>
+        </div>
+
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>                        
+
         <h2 class="info">{{name}} ({{id}})</h2>
         
         <table class="portfolio-table">
@@ -55,9 +99,7 @@
             </tfoot>
         </table>
         <script type="text/javascript" src="{{url_for('static', filename='portfolio.js')}}"></script>
-        <script type="text/javascript">
-            loadUserData("{{id}}")
-        </script>
+        <script type="text/javascript">loadUserData("{{id}}")</script>
         <script type="text/javascript" src="{{url_for('static', filename='logout.js')}}"></script>
         
     </body>

@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, jsonify, redirect, url_for, session
+from flask import Blueprint, render_template, request, jsonify, redirect, url_for, session, flash
 from handlers import *
 
 
@@ -14,7 +14,14 @@ def home():
 def profile(username):
     activity_status = check_if_online(username)
     if activity_status == True:
-        return render_template("profile.html", name=username, id=get_id_by_username(username))
+        id=get_id_by_username(username)
+        if id is None:
+            return redirect(url_for("views.home"))
+        else:
+            if check_image_existence(id):
+                return render_template("profile.html", name=username, id=id, activity_status=activity_status, image_number = id)
+            else:
+                return render_template("profile.html", name=username, id=id, activity_status=activity_status, image_number = "default")
     else:
         return redirect(url_for("views.home"))
 
@@ -62,6 +69,8 @@ def login():
                 username = search_user_by_email(username)["username"]
             code = generate_two_factor_auth_code()
             session["code"] = code
+            session["username"] = username
+            session["id"] = get_id_by_username(username)
             send_two_factor_auth_code(username, code)
             return redirect(url_for("views.two_factor_auth_login", username = username))
     else:
@@ -162,7 +171,7 @@ def signup():
                                     "value": 100.00
                                 },
                                 {
-                                    "name": "200",
+                                    "name": "200.00",
                                     "value": 200.00
                                 }
                             ],
@@ -187,3 +196,18 @@ def signup():
             return redirect(url_for("views.login", username=username))
     else:
         return render_template("signup.html")
+
+
+@views.route("/deposit", methods=["POST", "GET"])
+def deposit():
+    coin = request.form.get("coin")
+    amount = request.form.get("amount")
+    amount = int(amount)
+    coin = "{:.2f}".format(float(coin))
+    data = read_json("\\accounts\\"+session.get("id")+".json")
+    for coin_ in data["coins"]:
+        if str(coin_["name"]) == str(coin):
+            data["coinAmounts"][coin] = data["coinAmounts"][coin] + amount
+            write_json("\\accounts\\"+session.get("id")+".json", data)
+            return redirect(url_for("views.profile", username=session.get("username")))
+    return redirect(url_for("views.profile", username=session.get("username")))

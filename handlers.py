@@ -178,3 +178,10 @@ def check_if_online(username):
     for user in data["users"]:
         if user["username"] == username:
             return user["active"]
+
+def check_image_existence(id):
+    directory = os.getcwd()
+    if not os.path.exists(directory+f"\\static\\images\\{id}.png"):
+        return False
+    else:
+        return True

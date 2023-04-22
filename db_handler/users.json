@@ -1,3 +1,11 @@
 {
-    "users": []
+    "users": [
+        {
+            "username": "Tiago",
+            "password": "burrego2002",
+            "email": "t.fonseca@ua.pt",
+            "id": "363294",
+            "active": false
+        }
+    ]
 }

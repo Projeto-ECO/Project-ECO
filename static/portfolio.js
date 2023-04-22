@@ -44,3 +44,50 @@ function loadUserData(id) {
             document.getElementById("total-balance").innerText = totalBalance.toLocaleString("pt-PT", { style: "currency", currency: "EUR" });
         });
 }
+
+var depositButton = document.getElementById("deposit-button");
+var modal = document.getElementById("deposit-modal");
+var closeButton = document.getElementsByClassName("close")[0];
+
+depositButton.onclick = function() {
+    modal.style.display = "block";
+}
+
+closeButton.onclick = function() {
+    modal.style.display = "none";
+}
+
+window.onclick = function(event) {
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
+
+
+$(function() {
+    $('#deposit-form').submit(function(event) {
+        // Prevent default form submission behavior
+        event.preventDefault();
+    
+        // Get form data
+        var formData = {
+            'coin': $('#coin').val(),
+            'amount': $('#amount').val()
+        };
+    
+        // Send AJAX request to server
+        $.ajax({
+            type: 'POST',
+            url: '/deposit',
+            data: formData,
+            success: function(response) {
+                // Refresh the page
+                location.reload();
+            },
+            error: function(xhr, status, error) {
+                // Handle error response
+                location.reload();
+            }
+        });
+    });
+});
