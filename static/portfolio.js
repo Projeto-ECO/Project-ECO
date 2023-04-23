@@ -133,3 +133,8 @@ $(function() {
         });
     });
 });
+
+
+function redirectToNewPage(username) {
+    window.location.href = "/account/" + username;
+}

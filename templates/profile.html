@@ -28,7 +28,7 @@
                         <div class="container-profile-image">
                             <div class="profile">
                                 <div class="profile-img">
-                                    <img src="{{url_for('static', filename='images/' + image_number + '.png')}}" alt="profile">
+                                    <img src="{{ url_for('views.get_image', filename='accounts/' + id + '/' + id + '.png') }}" alt="profile" onclick="redirectToNewPage('{{name}}')">
                                 </div>
                                 <div class="profile-name">
                                 <h2>{{name}}</h2>
@@ -39,8 +39,7 @@
                             <ul>
                                 <li><a id="deposit-button">Deposit</a></li>
                                 <li><a id="withdrawl-button">Withdrawl</a></li>
-                                <li><a href="#">Loan</a></li>
-                                <li><a href="#">Statement</a></li>
+                                <li><a href="/download_pdf/{{id}}">Statement</a></li>
                                 <li><a href="/" id="logout-button">Logout</a></li>
                             </ul>
                         </div>

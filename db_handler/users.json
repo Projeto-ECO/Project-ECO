@@ -2,10 +2,10 @@
     "users": [
         {
             "username": "Tiago",
-            "password": "burrego2002",
+            "password": "1656",
             "email": "t.fonseca@ua.pt",
             "id": "363294",
-            "active": false
+            "active": true
         }
     ]
 }

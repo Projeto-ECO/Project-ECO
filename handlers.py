@@ -4,6 +4,14 @@ import win32com.client as win32
 import pythoncom
 import random
 from flask import jsonify
+import csv
+from datetime import datetime
+from reportlab.lib.pagesizes import letter
+from reportlab.lib import colors
+from reportlab.lib.styles import ParagraphStyle
+from reportlab.platypus import Table, TableStyle, SimpleDocTemplate, Image, Paragraph, Spacer
+from reportlab.lib.units import inch
+from reportlab.lib.enums import TA_CENTER
 
 
 def send_email(to, subject, body):
@@ -70,6 +78,14 @@ def write_json(file, data):
     with open(directory+file, "w+") as file:
             json.dump(data, file, indent=4)
 
+def search_user_by_id(id):
+    data = read_json("\\db_handler\\users.json")
+    if data is None:
+        return None
+    for user in data["users"]:
+        if user["id"] == id:
+            return user
+
 
 def search_user_by_email(email):
     data = read_json("\\db_handler\\users.json")
@@ -107,8 +123,6 @@ def validate_login(username, password):
 
 def send_recovery_password(email):
     user = search_user_by_email(email)
-    password = user["password"]
-    name = user["name"]
     if user is None:
         return False
     else:
@@ -181,30 +195,33 @@ def check_if_online(username):
 
 def check_image_existence(id):
     directory = os.getcwd()
-    if not os.path.exists(directory+f"\\static\\images\\{id}.png"):
+    if not os.path.exists(directory+f"\\accounts\\{id}\\{id}.png"):
         return False
     else:
         return True
 
 def banking_operations(id, operation,coin, amount):
-    data = read_json("\\db_handler\\users.json")
-    if data is None:
-        return None
     amount = int(amount)
     coin = "{:.2f}".format(float(coin))
-    data = read_json("\\accounts\\"+id+".json")
+    data = read_json("\\accounts\\"+id+"\\"+id+".json")
     if operation == "deposit":
         for coin_ in data["coins"]:
-            if str(coin_["name"]) == str(coin) and data["coinAmounts"][coin] >= amount and amount > 0:
-                data["coinAmounts"][coin] = data["coinAmounts"][coin] - amount
-                write_json("\\accounts\\"+id+".json", data)
-                return True
+            if str(coin_["name"]) == str(coin):
+                if register_operation(id, operation, coin, amount):
+                    data["coinAmounts"][coin] = data["coinAmounts"][coin] + amount
+                    write_json("\\accounts\\"+id+"\\"+id+".json", data)
+                    return True
+                else:
+                    return False
     elif operation == "withdraw":
         for coin_ in data["coins"]:
             if str(coin_["name"]) == str(coin) and data["coinAmounts"][coin] >= amount and amount > 0:
-                data["coinAmounts"][coin] = data["coinAmounts"][coin] + amount
-                write_json("\\accounts\\"+id+".json", data)
-                return True
+                if register_operation(id, operation, coin, amount):
+                    data["coinAmounts"][coin] = data["coinAmounts"][coin] - amount
+                    write_json("\\accounts\\"+id+"\\"+id+".json", data)
+                    return True
+                else:
+                    return False
     return False
 
 
@@ -224,5 +241,165 @@ def activate_user(id):
         if user["id"] == id:
             user["active"] = True
             write_json("\\db_handler\\users.json", data)
+            return True
+    return False
+
+def check_statement_existence(id):
+    directory = os.getcwd()
+    if not os.path.exists(directory+f"\\accounts\\{id}\\{id}.csv"):
+        with open(directory+f"\\accounts\\{id}\\{id}.csv", "w+", newline="") as file:
+            csv_writer = csv.writer(file)
+            csv_writer.writerow(["Date", "Operation", "Coin", "Amount", "Total", "Account Balance"])
+    return True
+
+
+def register_operation(id, operation, coin, amount):
+    accountBalance = get_account_balance(id)
+    try:
+        if check_statement_existence(id):
+            directory = os.getcwd()
+            with open(directory+f"\\accounts\\{id}\\{id}.csv", "a+", newline="") as file:
+                csv_writer = csv.writer(file)
+                total = float(coin) * float(amount)
+                if operation == "deposit":
+                    accountBalance += total
+                elif operation == "withdraw":
+                    accountBalance -= total
+                    total = -total
+                csv_writer.writerow([datetime.now(), operation.title(), coin, amount, "{:.2f}".format(total), "{:.2f}".format(accountBalance)])
+            return True
+    except:
+        return False
+
+
+def get_statement(id):
+    with open(os.getcwd()+f"\\accounts\\{id}\\{id}.csv", "r") as file:
+        csv_reader = csv.reader(file)
+        return list(csv_reader)
+
+
+def get_account_balance(id):
+    data = read_json("\\accounts\\"+id+"\\"+id+".json")
+    total = 0
+    for coin_ in data["coins"]:
+        total += float(data["coinAmounts"][coin_["name"]]) * float(coin_["value"])
+    with open("cenas.txt", "a+") as file:
+        file.write(str(total))
+    return total
+
+
+def csv_to_pdf(csv_path, id):
+    
+    # Set up input and output paths
+    input_path = csv_path
+    output_path = csv_path[:-3] + "pdf"
+
+    # Read the CSV file and convert it to a list of rows
+    with open(input_path, "r") as f:
+        rows = [row.strip().split(",") for row in f]
+
+    # Define the table style
+    style = TableStyle([
+        ("BACKGROUND", (0, 0), (-1, 0), colors.Color(77/255, 155/255, 75/255)),
+        ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),
+        ("ALIGN", (0, 0), (-1, 0), "CENTER"),
+        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+        ("FONTSIZE", (0, 0), (-1, 0), 14),
+        ("BOTTOMPADDING", (0, 0), (-1, 0), 12),
+        ("BACKGROUND", (0, 1), (-1, -1), colors.Color(102/255, 102/255, 102/255)),
+        ("TEXTCOLOR", (0, 1), (-1, -1), colors.whitesmoke),
+        ("ALIGN", (0, 1), (-1, -1), "CENTER"),
+        ("FONTNAME", (0, 1), (-1, -1), "Helvetica"),
+        ("FONTSIZE", (0, 1), (-1, -1), 12),
+        ("BOTTOMPADDING", (0, 1), (-1, -1), 6),
+        ("GRID", (0, 0), (-1, -1), 1, colors.black)
+    ])
+
+    # Create the table object
+    table = Table(rows)
+
+    # Apply the table style
+    table.setStyle(style)
+
+    # Create the PDF document and add the table to it
+    doc = SimpleDocTemplate(output_path, pagesize=letter)
+
+    # Create the logo image object
+    logo_path = os.getcwd()+f"\\static\\images\\Eco.png"
+    logo = Image(logo_path, width=1.5*inch, height=1*inch)
+
+    # Create the username and ID paragraph
+    username_style = ParagraphStyle(
+        name='UsernameStyle',
+        fontName='Helvetica',
+        fontSize=12,
+        textColor=colors.black,
+        alignment=TA_CENTER
+    )
+    username = search_user_by_id(id)["username"]
+    username_text = f"Username: {username} ({id})"
+    username_para = Paragraph(username_text, username_style)
+
+    # Create the date and time paragraph
+    datetime_style = ParagraphStyle(
+        name='DateTimeStyle',
+        fontName='Helvetica',
+        fontSize=12,
+        textColor=colors.black,
+        alignment=TA_CENTER
+    )
+    now = datetime.now()
+    datetime_text = f"Date: {now.strftime('%d-%m-%Y %H:%M:%S')}"
+    datetime_para = Paragraph(datetime_text, datetime_style)
+
+    # Add the logo, spacer, and username/ID paragraph to the PDF document
+    elements = [logo, Spacer(width=0, height=0.5*inch), username_para, Spacer(width=0, height=0.2*inch),table, Spacer(width=0, height=0.2*inch), datetime_para]
+
+    doc.build(elements)
+    return True
+
+
+def update_username(id, username):
+    data = read_json("\\db_handler\\users.json")
+    for user in data["users"]:
+        if user["id"] == id:
+            user["username"] = username
+            write_json("\\db_handler\\users.json", data)
+            return True
+    return False
+
+
+def update_email(id, email):
+    data = read_json("\\db_handler\\users.json")
+    for user in data["users"]:
+        if user["id"] == id:
+            user["email"] = email
+            write_json("\\db_handler\\users.json", data)
+            return True
+    return False
+
+
+def update_password(id, password):
+    data = read_json("\\db_handler\\users.json")
+    for user in data["users"]:
+        if user["id"] == id:
+            user["password"] = password
+            write_json("\\db_handler\\users.json", data)
+            return True
+    return False
+
+
+def check_username_exists(username):
+    data = read_json("\\db_handler\\users.json")
+    for user in data["users"]:
+        if user["username"] == username:
+            return True
+    return False
+
+
+def check_email_exists(email):
+    data = read_json("\\db_handler\\users.json")
+    for user in data["users"]:
+        if user["email"] == email:
             return True
     return False

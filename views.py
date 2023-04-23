@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, jsonify, redirect, url_for, session, flash
+from flask import Blueprint, render_template, request, jsonify, redirect, url_for, session, send_file
 from handlers import *
 
 
@@ -28,7 +28,7 @@ def profile(username):
 
 @views.route("/data/<id>")
 def get_data(id):
-    return jsonify(read_json("/accounts/"+id+".json"))
+    return jsonify(read_json("/accounts/"+id+"\\"+id+".json"))
 
 
 @views.route("/go-to-home")
@@ -190,7 +190,7 @@ def signup():
                                 "200.00": 0 
                             }
                         }
-            write_json("\\accounts\\"+id+".json", json_coins)
+            write_json("\\accounts\\"+id+"\\"+id+".json", json_coins)
             return redirect(url_for("views.login", username=username))
     else:
         return render_template("signup.html")
@@ -208,5 +208,67 @@ def deposit():
 def withdrawl():
     coin = request.form.get("coin-withdrawl")
     amount = request.form.get("amount-withdrawl")
-    banking_operations(session.get("id"), "deposit", coin, amount)
+    banking_operations(session.get("id"), "withdraw", coin, amount)
     return redirect(url_for("views.profile", username=session.get("username")))
+
+
+@views.route("/download_pdf/<id>")
+def download_pdf(id):
+    username = search_user_by_id(id)["username"]
+    csv_to_pdf(os.getcwd()+f"\\accounts\\{id}\\{id}.csv", id)
+    filename = os.getcwd()+f"\\accounts\\{id}\\{id}.pdf"
+    response = send_file(filename, as_attachment=True)
+    response.headers['Content-Disposition'] = f'attachment; filename=ECO_Statement_{username}.pdf'
+    return response
+
+
+@views.route("/account/<username>")
+def account(username):
+    return render_template("account.html", username=username, id=get_id_by_username(username))
+
+
+@views.route('/get_image/<path:filename>')
+def get_image(filename):
+    return send_file(filename, mimetype='image/png')
+
+
+@views.route("/update_account", methods=["POST"])
+def update_account():
+    # create the file path
+    id = session.get("id")
+    file_path = os.getcwd()+f"/accounts/{id}/{id}.png"
+
+    # save the uploaded file
+    profile_photo = request.files.get("profile_photo")
+    if profile_photo:
+        profile_photo.save(file_path)
+
+    username = request.form.get("username")
+    email = request.form.get("email")
+    password = request.form.get("psw")
+    if username != "":
+        update_username(id, username)
+        session["username"] = username
+    else:
+        username = search_user_by_id(id)["username"]
+    if email != "":
+        update_email(id, email)
+    if password != "":
+        update_password(id, password)
+    return redirect(url_for("views.profile", username=session.get("username")))
+
+
+@views.route('/check_username', methods=['POST'])
+def check_username():
+    username = request.form.get('username')
+    exists = check_username_exists(username)
+    response = {'exists': exists}
+    return jsonify(response)
+
+
+@views.route('/check_email', methods=['POST'])
+def check_email():
+    email = request.form.get('email')
+    exists = check_email_exists(email)
+    response = {'exists': exists}
+    return jsonify(response)
