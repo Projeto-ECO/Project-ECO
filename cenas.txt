@@ -1,7 +1,5 @@
-code-XZHQ join- create-False
-entrou-XZHQ {'name': '363294', 'message': 'sadfsaedf'}
-entrou-XZHQ {'name': '363294', 'message': 'sdfs'}
-entrou-XZHQ {'name': '363294', 'message': 'adfsdv'}
-entrou-XZHQ {'name': '363294', 'message': 'sadfv'}
-entrou-XZHQ {'name': '363294', 'message': 'sda'}
-entrou-XZHQ {'name': '363294', 'message': 'cvsad'}
+code-LSTQ join- create-False
+entrou-LSTQ {'name': '356166', 'message': 'sao todos paneleiros'}
+entrou-LSTQ {'name': '363294', 'message': 'gay'}
+entrou-LSTQ {'name': '574048', 'message': 'Hdufh'}
+entrou-LSTQ {'name': '574048', 'message': 'Hdudhxh'}0.02.04.04.06.012.012.018.020.025.035.035.045.045.047.047.057.063.069.070.092.0100.0100.0102.0102.0104.0106.0108.0108.0110.0110.0115.0117.0117.0119.0119.0121.0121.0123.0125.0127.00.02.012.0112.0

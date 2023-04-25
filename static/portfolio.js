@@ -65,31 +65,37 @@ window.onclick = function(event) {
     }
 }
 
+var requestSent = false;
+
 $(function() {
     $('#deposit-form').submit(function(event) {
-        // Prevent default form submission behavior
-        event.preventDefault();
-    
-        // Get form data
-        var formData = {
-            'coin-deposit': $('#coin-deposit').val(),
-            'amount-deposit': $('#amount-deposit').val()
-        };
-    
-        // Send AJAX request to server
-        $.ajax({
-            type: 'POST',
-            url: '/deposit/'+name_,
-            data: formData,
-            success: function(response) {
-                // Refresh the page
-                location.reload();
-            },
-            error: function(xhr, status, error) {
-                // Handle error response
-                location.reload();
-            }
-        });
+        if (!requestSent) {
+            // Prevent default form submission behavior
+            event.preventDefault();
+            event.stopPropagation();
+        
+            // Get form data
+            var formData = {
+                'coin-deposit': $('#coin-deposit').val(),
+                'amount-deposit': $('#amount-deposit').val()
+            };
+        
+            // Send AJAX request to server
+            $.ajax({
+                type: 'POST',
+                url: '/deposit/'+name_,
+                data: formData,
+                success: function(response) {
+                    // Refresh the page
+                    location.href = "/profile/" + name_;
+                },
+                error: function(xhr, status, error) {
+                    // Handle error response
+                    location.href = "/profile/" + name_;
+                }
+            });
+        }
+        requestSent = true;
     });
 });
 
@@ -106,31 +112,36 @@ closeButtonWithdrawl.onclick = function() {
     modalWithdrawl.style.display = "none";
 }
 
+var requestSent_ = false;
+
 $(function() {
     $('#withdrawl-form').submit(function(event) {
-        // Prevent default form submission behavior
-        event.preventDefault();
-    
-        // Get form data
-        var formData = {
-            'coin-withdrawl': $('#coin-withdrawl').val(),
-            'amount-withdrawl': $('#amount-withdrawl').val()
-        };
-    
-        // Send AJAX request to server
-        $.ajax({
-            type: 'POST',
-            url: '/withdrawl/'+name_,
-            data: formData,
-            success: function(response) {
-                // Refresh the page
-                location.reload();
-            },
-            error: function(xhr, status, error) {
-                // Handle error response
-                location.reload();
-            }
-        });
+        if (!requestSent_) {
+            // Prevent default form submission behavior
+            event.preventDefault();
+        
+            // Get form data
+            var formData = {
+                'coin-withdrawl': $('#coin-withdrawl').val(),
+                'amount-withdrawl': $('#amount-withdrawl').val()
+            };
+        
+            // Send AJAX request to server
+            $.ajax({
+                type: 'POST',
+                url: '/withdrawl/'+name_,
+                data: formData,
+                success: function(response) {
+                    // Refresh the page
+                    location.href = "/profile/" + name_;
+                },
+                error: function(xhr, status, error) {
+                    // Handle error response
+                    location.href = "/profile/" + name_;
+                }
+            });
+        }
+        requestSent_ = true;
     });
 });
 

@@ -85,6 +85,7 @@ def write_json(file, data):
         os.makedirs(directory+file[1:file.rfind("\\")])
     with open(directory+file, "w+") as file:
             json.dump(data, file, indent=4)
+    return True
 
 def search_user_by_id(id):
     data = read_json("\\db_handler\\users.json")
@@ -217,17 +218,18 @@ def check_image_existence(id):
     else:
         return True
 
-def banking_operations(id, operation,coin, amount):
+def banking_operations(id, operation, coin, amount):
     amount = int(amount)
     coin = "{:.2f}".format(float(coin))
     data = read_json("\\accounts\\"+id+"\\"+id+".json")
     if operation == "deposit":
         for coin_ in data["coins"]:
             if str(coin_["name"]) == str(coin):
-                if register_operation(id, operation, coin, amount):
+                boolean = register_operation(id, operation, coin, amount)
+                if boolean:
                     data["coinAmounts"][coin] = data["coinAmounts"][coin] + amount
                     write_json("\\accounts\\"+id+"\\"+id+".json", data)
-                    return True
+                    break
                 else:
                     return False
     elif operation == "withdraw":
@@ -236,10 +238,11 @@ def banking_operations(id, operation,coin, amount):
                 if register_operation(id, operation, coin, amount):
                     data["coinAmounts"][coin] = data["coinAmounts"][coin] - amount
                     write_json("\\accounts\\"+id+"\\"+id+".json", data)
-                    return True
+                    break
                 else:
                     return False
-    return False
+    return True
+
 
 
 def inactivate_user(id):
@@ -283,9 +286,13 @@ def register_operation(id, operation, coin, amount):
                 total = -total
             else:
                 return False
+            statement_row = [datetime.now().strftime('%d-%m-%Y %H:%M:%S'), operation.title(), coin+" €", amount, "{:.2f}".format(total)+" €", "{:.2f}".format(accountBalance)+" €"]
             with open(directory+f"\\accounts\\{id}\\{id}.csv", "a+", newline="") as file:
-                csv_writer = csv.writer(file)
-                csv_writer.writerow([datetime.now().strftime('%d-%m-%Y %H:%M:%S'), operation.title(), coin+" €", amount, "{:.2f}".format(total)+" €", "{:.2f}".format(accountBalance)+" €"])
+                csv_reader = csv.reader(file)
+                existing_rows = [row for row in csv_reader]
+                if statement_row not in existing_rows:
+                    csv_writer = csv.writer(file)
+                    csv_writer.writerow(statement_row)
                 return True
     except:
         return False

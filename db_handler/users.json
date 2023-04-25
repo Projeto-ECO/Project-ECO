@@ -10,16 +10,23 @@
         {
             "username": "Tomas",
             "password": "1647",
-            "email": "tomasfonseca14@hotmail.com",
+            "email": "tomasfonseca14@ua.pt",
             "id": "574048",
-            "active": true
+            "active": false
         },
         {
             "username": "Luisa",
             "password": "1234",
             "email": "pockettomas2002@gmail.com",
             "id": "838951",
-            "active": true
+            "active": false
+        },
+        {
+            "username": "Rodrigues",
+            "password": "tiago123",
+            "email": "tiagosrodrigues18@gmail.com",
+            "id": "356166",
+            "active": false
         }
     ]
 }

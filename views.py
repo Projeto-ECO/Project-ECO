@@ -46,6 +46,7 @@ def go_to_home():
 def two_factor_auth_login(username):
     code = session.get("code")
     data = read_json("\\db_handler\\users.json")
+    print("CODE------------------------ "+ code)
     for user in data["users"]:
         if user["username"] == username:
             if user["active"] == True: # check if user is already authenticated
@@ -206,6 +207,7 @@ def signup():
 
 @views.route("/deposit/<name>", methods=["POST", "GET"])
 def deposit(name):
+    print("entrou")
     coin = request.form.get("coin-deposit")
     if "," in coin:
         coin = coin.replace(",", ".")
