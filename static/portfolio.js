@@ -79,7 +79,7 @@ $(function() {
         // Send AJAX request to server
         $.ajax({
             type: 'POST',
-            url: '/deposit',
+            url: '/deposit/'+name_,
             data: formData,
             success: function(response) {
                 // Refresh the page
@@ -120,7 +120,7 @@ $(function() {
         // Send AJAX request to server
         $.ajax({
             type: 'POST',
-            url: '/withdrawl',
+            url: '/withdrawl/'+name_,
             data: formData,
             success: function(response) {
                 // Refresh the page

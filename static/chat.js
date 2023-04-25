@@ -6,20 +6,35 @@ socketio.on("message", (data) => {
 });
 
 const createMessage = (name, msg, imgSrc) => {
+    const isCurrentUser = currentUser == name;
+    console.log(isCurrentUser);
+    const messageClass = isCurrentUser ? 'current-user' : '';
+
+    const senderImageClass = isCurrentUser ? `sender-image-${messageClass}` : `sender-image`;
+
+    const imgElement = `<img src="${imgSrc}" alt="${name}'s image" class="${senderImageClass}">`;
+    const nameElement = `${name}`;
+    const senderContent = isCurrentUser ? `${nameElement}${imgElement}` : `${imgElement}${nameElement}`;
+    const senderClass = isCurrentUser ? `sender-${messageClass}` : `sender`;
+
+    const mutedClass = isCurrentUser ? `muted-${messageClass}` : `muted`;
+    const textClass = isCurrentUser ? `text-${messageClass}` : `text`;
+
     const content = `
-    <div class="message">
-        <div class="sender">
-            <img src="${imgSrc}" alt="${name}'s image" class="sender-image">
-            ${name}
+        <div class="${messageClass}">
+            <div class="${senderClass}">
+                ${senderContent}
+            </div>
+            <div class="${textClass}">${msg.replace(/\n/g, "<br>")}</div>
+            <div class="${mutedClass}">${new Date().toLocaleString()}</div>
+            <br>
         </div>
-        <div class="text">${msg.replace(/\n/g, "<br>")}</div>
-        <div class="muted">${new Date().toLocaleString()}</div>
-        <br>
-    </div>
     `;
     messages.insertAdjacentHTML("beforeend", content);
     messages.scrollTop = messages.scrollHeight;
 };
+
+
 
 const sendMessage = (id_, name_) => {
     const message = document.getElementById("message");

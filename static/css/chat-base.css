@@ -33,6 +33,7 @@
     flex-direction: column;
     width: 50vw;
     align-items: stretch;
+    max-width: 932px;
 }
 
 .messages {
@@ -46,6 +47,7 @@
     overflow-x: hidden;
     height: 400px;
     overflow: auto;
+    max-width: 932px;
 }
 
 .sender {
@@ -55,11 +57,25 @@
     align-items: flex-start; 
     display: flex;
     color : whitesmoke;
+    max-width: 932px;
 }
+
+.sender-current-user {
+    margin-left: 1em;
+    overflow-x: hidden;
+    max-width: 932px;
+    align-items: flex-end;
+    text-align: right;
+
+    color : whitesmoke;
+    font-weight: bold;
+}
+
 
 .messages::-webkit-scrollbar {
     display: none;
 }
+
 
 .inputs textarea {
     border-radius: 20px;
@@ -105,6 +121,16 @@
     height: 25px;
     width: 25px;
     margin-right: 7px;
+    max-width: 932px;
+}
+
+
+.sender-image-current-user {
+    border-radius: 50%;
+    height: 25px;
+    width: 25px;
+    margin-left: 7px;
+    max-width: 932px;
 }
 
 
@@ -114,14 +140,35 @@
     align-items: flex-start;
     justify-content: space-between;
     margin-left: 1em;
-    max-width: 50%; /* limit width to 50% of parent container */
+    max-width: 45%; /* limit width to 50% of parent container */
     width: fit-content;
     background-color: rgb(77, 155, 75); /* set background color */
     padding: 10px; /* add some padding */
     border-radius: 10px; /* round the corners */
-    text-align: left; /* align text to the right */
     font-size: 14px;
+    text-align: left; /* align text to the left by default */
 }
+
+.text-current-user {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-left: 1em;
+    margin-left: auto; /* add this line */
+    max-width: 50%;
+    width: fit-content;
+    background-color: rgb(77, 155, 75);
+    padding: 10px;
+    border-radius: 10px;
+    font-size: 14px;
+    text-align: left;
+    max-width: 45%; /* limit width to 50% of parent container */
+}
+
+
+
+
 
 textarea {
     resize: none;
@@ -135,4 +182,17 @@ textarea {
     margin-top: 3px;
     display: flex;
     margin-left: 1.6em;
+    max-width: 932px;
+}
+
+.muted-current-user {
+    margin-right: 1em;
+    overflow-x: hidden;
+    max-width: 932px;
+    align-items: flex-end;
+    text-align: right;
+
+    color: whitesmoke;
+    font-size: 10px;
+    margin-top: 3px;
 }

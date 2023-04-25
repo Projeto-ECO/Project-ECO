@@ -275,16 +275,18 @@ def register_operation(id, operation, coin, amount):
     try:
         if check_statement_existence(id):
             directory = os.getcwd()
+            total = float(coin) * float(amount)
+            if operation == "deposit":
+                accountBalance += total
+            elif operation == "withdraw":
+                accountBalance -= total
+                total = -total
+            else:
+                return False
             with open(directory+f"\\accounts\\{id}\\{id}.csv", "a+", newline="") as file:
                 csv_writer = csv.writer(file)
-                total = float(coin) * float(amount)
-                if operation == "deposit":
-                    accountBalance += total
-                elif operation == "withdraw":
-                    accountBalance -= total
-                    total = -total
                 csv_writer.writerow([datetime.now().strftime('%d-%m-%Y %H:%M:%S'), operation.title(), coin+" €", amount, "{:.2f}".format(total)+" €", "{:.2f}".format(accountBalance)+" €"])
-            return True
+                return True
     except:
         return False
 

@@ -107,13 +107,16 @@
             </tfoot>
         </table>
         <div class="chat-icon">
-            <a class="chat-button" href="/chat_home/{{id}}" target="_blank"><img src="{{url_for('static', filename='images/chat2.png')}}" alt="Chat Icon"></a>
+            <a class="chat-button" href="/chat_home/{{id}}" target="_blank"><img src="{{url_for('static', filename='images/chat3.png')}}" alt="Chat Icon"></a>
         </div>
         <script type="text/javascript" src="{{url_for('static', filename='portfolio.js')}}"></script>
         <script type="text/javascript">loadUserData("{{id}}")</script>
         <script type="text/javascript" src="{{url_for('static', filename='logout.js')}}"></script>
         
     </body>
+    <script type="text/javascript">
+        var name_ = "{{name}}";
+    </script>
     <script type="text/javascript">searchUsers()</script>
     <script type="text/javascript">openChatWithUser({name})</script>
     <script type="text/javascript" src="{{url_for('static', filename='portfolio.js')}}"></script>

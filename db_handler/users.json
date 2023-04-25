@@ -9,9 +9,16 @@
         },
         {
             "username": "Tomas",
-            "password": "burrego2002",
-            "email": "tiagofonseca2002@hotmail.com",
+            "password": "1647",
+            "email": "tomasfonseca14@hotmail.com",
             "id": "574048",
+            "active": true
+        },
+        {
+            "username": "Luisa",
+            "password": "1234",
+            "email": "pockettomas2002@gmail.com",
+            "id": "838951",
             "active": true
         }
     ]

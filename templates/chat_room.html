@@ -16,6 +16,7 @@
 </div>
 <script>
     var imagePath = "{{ url_for('views.get_image', filename='accounts/' + id + '/' + id + '.png') }}";
+    var currentUser = "{{ name }}";
 </script>
 <script type="text/javascript" src="{{url_for('static', filename='chat.js')}}"></script>
 {% for msg in messages %}

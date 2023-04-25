@@ -204,20 +204,24 @@ def signup():
         return render_template("signup.html")
 
 
-@views.route("/deposit", methods=["POST", "GET"])
-def deposit():
+@views.route("/deposit/<name>", methods=["POST", "GET"])
+def deposit(name):
     coin = request.form.get("coin-deposit")
+    if "," in coin:
+        coin = coin.replace(",", ".")
     amount = request.form.get("amount-deposit")
-    banking_operations(session.get("id"), "deposit", coin, amount)
-    return redirect(url_for("views.profile", username=session.get("username")))
+    banking_operations(get_id_by_username(name), "deposit", coin, amount)
+    return redirect(url_for("views.profile", username=name))
 
 
-@views.route("/withdrawl", methods=["POST", "GET"])
-def withdrawl():
+@views.route("/withdrawl/<name>", methods=["POST", "GET"])
+def withdrawl(name):
     coin = request.form.get("coin-withdrawl")
+    if "," in coin:
+        coin = coin.replace(",", ".")
     amount = request.form.get("amount-withdrawl")
-    banking_operations(session.get("id"), "withdraw", coin, amount)
-    return redirect(url_for("views.profile", username=session.get("username")))
+    banking_operations(get_id_by_username(name), "withdraw", coin, amount)
+    return redirect(url_for("views.profile", username=name))
 
 
 @views.route("/download_pdf/<id>")
@@ -307,7 +311,7 @@ def chat_home(id):
         
         session["room"] = room_code
         session["name"] = get_username_by_id(id)
-        return redirect(url_for("views.chat_room", id = id))
+        return redirect(url_for("views.chat_room", id = id, name  = session.get("name")))
 
     return render_template("chat_home.html")
 
@@ -355,7 +359,7 @@ def on_connect(auth):
     
     join_room(room)
     print(f"{name} joined room {room}")
-    send({"name": name, "message": "has entered the room"}, to=room)
+    send({"name": name, "message": name+" has entered the room"}, to=room)
 
     add_room_member(room, name, get_id_by_username(name))
     print(f"{name} joined room {room}")
@@ -364,7 +368,7 @@ def on_connect(auth):
 def on_disconnect():
     room = session.get("room")
     name = session.get("name")
-    print(f"{name} disconnected from room {room}")
+    print(f"{name} disconrnected from oom {room}")
     leave_room(room)
 
     if check_room_code_exists(room) == True:
@@ -377,5 +381,5 @@ def on_disconnect():
         if get_number_of_room_members(room) <= 0:
             delete_room(room)
     
-    send({"name": name, "message": "has left the room"}, to=room)
+    send({"name": name, "message": name+"has left the room"}, to=room)
     print(f"{name} has left the room {room}")
