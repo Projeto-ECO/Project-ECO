@@ -12,6 +12,9 @@ from reportlab.lib.styles import ParagraphStyle
 from reportlab.platypus import Table, TableStyle, SimpleDocTemplate, Image, Paragraph, Spacer
 from reportlab.lib.units import inch
 from reportlab.lib.enums import TA_CENTER
+import shutil
+from string import ascii_uppercase
+import bleach
 
 
 def send_email(to, subject, body):
@@ -67,6 +70,9 @@ def read_json(filename):
     if not os.path.exists(directory+filename) and filename == "\\db_handler\\users.json":
         write_json(filename, {"users": []})
         data = None
+    elif not os.path.exists(directory+filename) and filename == "\\db_handler\\rooms.json":
+        write_json(filename, {"rooms": []})
+        data = None
     else:
         with open(directory+filename) as file:
             data = json.load(file)
@@ -75,6 +81,8 @@ def read_json(filename):
 
 def write_json(file, data):
     directory = os.getcwd()
+    if not os.path.exists(directory+file[1:file.rfind("\\")]):
+        os.makedirs(directory+file[1:file.rfind("\\")])
     with open(directory+file, "w+") as file:
             json.dump(data, file, indent=4)
 
@@ -186,6 +194,15 @@ def get_id_by_username(username):
             return user["id"]
     return None
 
+def get_username_by_id(id):
+    data = read_json("\\db_handler\\users.json")
+    if data is None:
+        return None
+    for user in data["users"]:
+        if user["id"] == id:
+            return user["username"]
+    return None
+
 
 def check_if_online(username):
     data = read_json("\\db_handler\\users.json")
@@ -266,7 +283,7 @@ def register_operation(id, operation, coin, amount):
                 elif operation == "withdraw":
                     accountBalance -= total
                     total = -total
-                csv_writer.writerow([datetime.now(), operation.title(), coin, amount, "{:.2f}".format(total), "{:.2f}".format(accountBalance)])
+                csv_writer.writerow([datetime.now().strftime('%d-%m-%Y %H:%M:%S'), operation.title(), coin+" €", amount, "{:.2f}".format(total)+" €", "{:.2f}".format(accountBalance)+" €"])
             return True
     except:
         return False
@@ -401,5 +418,115 @@ def check_email_exists(email):
     data = read_json("\\db_handler\\users.json")
     for user in data["users"]:
         if user["email"] == email:
+            return True
+    return False
+
+
+def create_user_folder(id):
+    directory = os.getcwd()
+    os.mkdir(directory+f"\\accounts\\{id}")
+    # Set the paths for the source and destination files
+    src_path = directory+f"\\static\\images\\default.png"
+    dst_path = directory+f"\\accounts\\{id}\\{id}.png"
+
+    # Copy the source file to the destination file
+    shutil.copy(src_path, dst_path)
+
+
+def create_room():
+    room_code = generate_unique_code(4)
+    data = read_json("\\db_handler\\rooms.json")
+    data["rooms"].append({"code": room_code, "members": [], "messages": []})
+    write_json("\\db_handler\\rooms.json", data)
+    return room_code
+
+
+def get_rooms():
+    data = read_json("\\db_handler\\rooms.json")
+    return data
+
+
+def generate_unique_code(length):
+    while True:
+        code = ""
+        for _ in range(length):
+            code += random.choice(ascii_uppercase)
+        
+        if check_room_code_exists(code) == False:
+            break
+    
+    return code
+
+
+def check_room_code_exists(code):
+    data = read_json("\\db_handler\\rooms.json")
+    if data["rooms"] == []:
+        return False
+    for room in data["rooms"]:
+        if room["code"] == code:
+            return True
+    return False
+
+
+def get_room_messages(code):
+    data = read_json("\\db_handler\\rooms.json")
+    for room in data["rooms"]:
+        if room["code"] == code:
+            messages = room["messages"]
+            # Sanitize each message using bleach and add HTML line breaks
+            for message in messages:
+                message["name"] = bleach.clean(message["name"], tags=[], attributes={})
+                message["message"] = bleach.clean(message["message"], tags=["a", "abbr", "acronym", "b", "blockquote", "code", "em", "i", "li", "ol", "strong", "ul"], attributes={"a": ["href", "title"]})
+                message["message"] = message["message"].replace('\n', '<br>')
+            return messages
+    return False
+
+
+
+def get_room_members(code):
+    data = read_json("\\db_handler\\rooms.json")
+    for room in data["rooms"]:
+        if room["code"] == code:
+            return room["members"]
+    return False
+
+def add_room_member(code, name, id):
+    data = read_json("\\db_handler\\rooms.json")
+    members = get_room_members(code)
+    for member in members:
+        if member["id"] == id or member["name"] == name:
+            return False
+    for room in data["rooms"]:
+        if room["code"] == code:
+            room["members"].append({"name": name, "id": id})
+            write_json("\\db_handler\\rooms.json", data)
+            return True
+    return False
+
+def add_room_message(code, message):
+    data = read_json("\\db_handler\\rooms.json")
+    for room in data["rooms"]:
+        if room["code"] == code:
+            room["messages"].append(message)
+            write_json("\\db_handler\\rooms.json", data)
+            return True
+    return False
+
+def get_number_of_room_members(code):
+    data = read_json("\\db_handler\\rooms.json")
+    rooms = data["rooms"]
+    number = 0
+    for room in rooms:
+        if room["code"] == code:
+            number = len(room["members"])
+    return number
+
+def delete_room(id):
+    data = read_json("\\db_handler\\rooms.json")
+    rooms = data["rooms"]
+    for room in rooms:
+        if room["code"] == id:
+            rooms.remove(room)
+            write_json("\\db_handler\\rooms.json", data)
             return True
     return False

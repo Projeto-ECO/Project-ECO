@@ -1,0 +1,27 @@
+<script src="https://cdn.socket.io/4.4.1/socket.io.min.js" integrity="sha384-5MVjdZbRR2N5/A9yvyzhIm0DJ/5wvfw/MpKoOgGJ6Kj48EsLxhZpWV8Uu/g6BDFz" crossorigin="anonymous"></script>
+
+{% extends 'chat_base.html' %} {% block content %}
+<div style="margin: 0 auto;">
+    <h2 style="color: white;">Chat Room: {{code}}</h2>
+    <div class="message-box">
+        <div class="messages" id="messages"></div>
+        <div class="scroll-to-bottom" id="scroll-to-bottom" style="display:none;">
+            <a href="#" onclick="scrollToBottom(); return false;">Go to bottom</a>
+        </div>
+        <div class="inputs">
+            <textarea rows="3" placeholder="Message" name="message" id="message" data-id="{{ id }}" data-name="{{ name }}"></textarea>
+            <button type="button" name="send" id="send-btn" onClick="sendMessage('{{ id }}', '{{ name }}')">Send</button>
+        </div>
+    </div>
+</div>
+<script>
+    var imagePath = "{{ url_for('views.get_image', filename='accounts/' + id + '/' + id + '.png') }}";
+</script>
+<script type="text/javascript" src="{{url_for('static', filename='chat.js')}}"></script>
+{% for msg in messages %}
+<script type="text/javascript">
+    createMessage("{{msg.name}}", "{{msg.message|safe}}", imagePath);
+</script>
+{% endfor %}
+{% endblock %}
+

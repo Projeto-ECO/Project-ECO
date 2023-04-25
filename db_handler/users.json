@@ -5,7 +5,14 @@
             "password": "1656",
             "email": "t.fonseca@ua.pt",
             "id": "363294",
-            "active": false
+            "active": true
+        },
+        {
+            "username": "Tomas",
+            "password": "burrego2002",
+            "email": "tiagofonseca2002@hotmail.com",
+            "id": "574048",
+            "active": true
         }
     ]
 }

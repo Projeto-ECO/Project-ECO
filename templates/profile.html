@@ -43,7 +43,7 @@
                                 <li><a href="/" id="logout-button">Logout</a></li>
                             </ul>
                         </div>
-                    </div>
+                    </div>               
                 </div>
             </div>
         </nav>
@@ -106,9 +106,15 @@
                 </tr>
             </tfoot>
         </table>
+        <div class="chat-icon">
+            <a class="chat-button" href="/chat_home/{{id}}" target="_blank"><img src="{{url_for('static', filename='images/chat2.png')}}" alt="Chat Icon"></a>
+        </div>
         <script type="text/javascript" src="{{url_for('static', filename='portfolio.js')}}"></script>
         <script type="text/javascript">loadUserData("{{id}}")</script>
         <script type="text/javascript" src="{{url_for('static', filename='logout.js')}}"></script>
         
     </body>
+    <script type="text/javascript">searchUsers()</script>
+    <script type="text/javascript">openChatWithUser({name})</script>
+    <script type="text/javascript" src="{{url_for('static', filename='portfolio.js')}}"></script>
 </html>

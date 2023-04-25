@@ -256,3 +256,21 @@ order: 2;
     border-radius: 5px;
     margin-top: 5px;
 }
+
+.chat-icon img {
+    width: 30px; /* set the width to the desired size */
+    height: auto; /* set height to auto to maintain aspect ratio */
+    margin-top: 10px;
+}
+
+
+.chat-icon {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1;
+}
+
+.chat-button img {
+    width: 50px;
+}

@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for, session, send_file
 from handlers import *
+from flask_socketio import send, leave_room, join_room
 
 
 views = Blueprint(__name__, "views")
@@ -24,6 +25,11 @@ def profile(username):
                 return render_template("profile.html", name=username, id=id, activity_status=activity_status, image_number = "default")
     else:
         return redirect(url_for("views.home"))
+
+
+@views.route("db_handler/users.json")
+def get_users():
+    return jsonify(read_json("\\db_handler\\users.json"))
 
 
 @views.route("/data/<id>")
@@ -51,6 +57,7 @@ def two_factor_auth_login(username):
                         user["active"] = True
                         write_json("\\db_handler\\users.json", data)
                         session["username"] = username
+                        session["id"] = get_id_by_username(username)
                         return redirect(url_for("views.profile", username=username))
                 return render_template("two-factor-auth-login.html", username=username)
     return redirect(url_for("views.login"))
@@ -190,6 +197,7 @@ def signup():
                                 "200.00": 0 
                             }
                         }
+            create_user_folder(id)
             write_json("\\accounts\\"+id+"\\"+id+".json", json_coins)
             return redirect(url_for("views.login", username=username))
     else:
@@ -232,10 +240,9 @@ def get_image(filename):
     return send_file(filename, mimetype='image/png')
 
 
-@views.route("/update_account", methods=["POST"])
-def update_account():
+@views.route("/update_account/<id>", methods=["POST"])
+def update_account(id):
     # create the file path
-    id = session.get("id")
     file_path = os.getcwd()+f"/accounts/{id}/{id}.png"
 
     # save the uploaded file
@@ -255,7 +262,7 @@ def update_account():
         update_email(id, email)
     if password != "":
         update_password(id, password)
-    return redirect(url_for("views.profile", username=session.get("username")))
+    return redirect(url_for("views.profile", username=get_username_by_id(id)))
 
 
 @views.route('/check_username', methods=['POST'])
@@ -272,3 +279,103 @@ def check_email():
     exists = check_email_exists(email)
     response = {'exists': exists}
     return jsonify(response)
+
+
+
+@views.route("/chat_home/<id>", methods=["POST", "GET"])
+def chat_home(id):
+    session.clear()
+    if request.method == "POST":
+        code = request.form.get("code")
+        join = request.form.get("join", False)
+        create = request.form.get("create", False)
+
+        with open("cenas.txt", "w+") as f:
+                f.write("code-" + str(code) + " join-" + str(join) + " create-" + str(create))
+
+        if join != False and not code:
+            with open("cenas.txt", "a+") as f:
+                f.write("\nentrou")
+            return render_template("chat_home.html", error="Please enter a room code.", code=code, name=id)
+        
+
+        room_code = code
+        if create != False:
+            room_code = create_room()
+        elif check_room_code_exists(code) == False:
+            return render_template("chat_home.html", error="Room does not exist.", code=code, name=id)
+        
+        session["room"] = room_code
+        session["name"] = get_username_by_id(id)
+        return redirect(url_for("views.chat_room", id = id))
+
+    return render_template("chat_home.html")
+
+
+@views.route("/chat_room/<id>")
+def chat_room(id):
+    room = session.get("room")
+    if room is None or check_room_code_exists(room) == False:
+        return redirect(url_for("views.chat_home", id=id))
+    messages = get_room_messages(room)
+    return render_template("chat_room.html", code=room, messages=messages, id=id, name=get_username_by_id(id))
+
+
+def new_message(data):
+    room = session.get("room")
+    with(open("cenas.txt", "a+")) as f:
+        f.write("\nentrou-" + str(room) + " " + str(data))
+    
+    if check_room_code_exists(room) == False:
+        return
+    
+    name = get_username_by_id(data["name"])
+
+    content = {
+        "name": name,
+        "id" : data["name"],
+        "message": data["message"]
+    }
+    send(content, to=room)
+    add_room_message(room, content)
+    print(f"{name} said: {data['message']}")
+
+
+def on_connect(auth):
+    room = session.get("room")
+    name = session.get("name")
+    print(f"{name} connected to room {room}")
+    if not room or not name:
+        print("Room or name not found")
+        return
+    if check_room_code_exists(room) == False:
+        print(f"Room {room} does not exist")
+        leave_room(room)
+        return
+    
+    join_room(room)
+    print(f"{name} joined room {room}")
+    send({"name": name, "message": "has entered the room"}, to=room)
+
+    add_room_member(room, name, get_id_by_username(name))
+    print(f"{name} joined room {room}")
+
+
+def on_disconnect():
+    room = session.get("room")
+    name = session.get("name")
+    print(f"{name} disconnected from room {room}")
+    leave_room(room)
+
+    if check_room_code_exists(room) == True:
+        data = read_json("\\db_handler\\rooms.json")
+        for room in data["rooms"]:
+            if room["code"] == session.get("room"):
+                print(f"{name} left room {room} -----454645645")
+                room["members"].remove({"name": name, "id": get_id_by_username(name)})
+                break
+        if get_number_of_room_members(room) <= 0:
+            delete_room(room)
+    
+    send({"name": name, "message": "has left the room"}, to=room)
+    print(f"{name} has left the room {room}")
