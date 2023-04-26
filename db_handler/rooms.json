@@ -1,12 +1,8 @@
 {
     "rooms": [
         {
-            "code": "TTWC",
+            "code": "DAJS",
             "members": [
-                {
-                    "name": "Tomas",
-                    "id": "574048"
-                },
                 {
                     "name": "Tiago",
                     "id": "363294"
@@ -16,112 +12,20 @@
                 {
                     "name": "Tiago",
                     "id": "363294",
-                    "message": "boas"
+                    "message": "ola",
+                    "time": "14:41"
                 },
                 {
                     "name": "Tiago",
                     "id": "363294",
-                    "message": "asdas"
-                },
-                {
-                    "name": "Tiago",
-                    "id": "363294",
-                    "message": "asdasdfasd"
-                },
-                {
-                    "name": "Tiago",
-                    "id": "363294",
-                    "message": "sdfszdf"
-                },
-                {
-                    "name": "Tiago",
-                    "id": "363294",
-                    "message": "dsfsdfsd"
-                },
-                {
-                    "name": "Tiago",
-                    "id": "363294",
-                    "message": "fdsfsdfds"
-                },
-                {
-                    "name": "Tiago",
-                    "id": "363294",
-                    "message": "sdfsdfsdfS"
-                },
-                {
-                    "name": "Tiago",
-                    "id": "363294",
-                    "message": "sdfsdfs"
-                },
-                {
-                    "name": "Tiago",
-                    "id": "363294",
-                    "message": "bhbnbn"
-                },
-                {
-                    "name": "Tiago",
-                    "id": "363294",
-                    "message": "gnmmnyujuy"
-                },
-                {
-                    "name": "Tiago",
-                    "id": "363294",
-                    "message": "dfsdvcsdfsd"
-                },
-                {
-                    "name": "Tiago",
-                    "id": "363294",
-                    "message": "dfgdf"
-                },
-                {
-                    "name": "Tiago",
-                    "id": "363294",
-                    "message": "gfddf"
-                },
-                {
-                    "name": "Tiago",
-                    "id": "363294",
-                    "message": "fdbfdgxcv"
-                },
-                {
-                    "name": "Tiago",
-                    "id": "363294",
-                    "message": "bcvxcvbxc"
-                },
-                {
-                    "name": "Tomas",
-                    "id": "574048",
-                    "message": "dfbdfbfdxg"
-                },
-                {
-                    "name": "Tiago",
-                    "id": "363294",
-                    "message": "vbnmbvhm"
-                },
-                {
-                    "name": "Tiago",
-                    "id": "363294",
-                    "message": "jk.,jk.kl"
-                },
-                {
-                    "name": "Tiago",
-                    "id": "363294",
-                    "message": "fgdzgfd"
-                },
-                {
-                    "name": "Tiago",
-                    "id": "363294",
-                    "message": "ilkjulkj"
+                    "message": "sadkfhjbasdkjhfvasd",
+                    "time": "14:41"
                 }
             ]
         },
         {
-            "code": "VMWU",
+            "code": "ELDI",
             "members": [
-                {
-                    "name": "Tomas",
-                    "id": "574048"
-                },
                 {
                     "name": "Tiago",
                     "id": "363294"
@@ -131,335 +35,210 @@
                 {
                     "name": "Tiago",
                     "id": "363294",
-                    "message": "asdas"
-                },
-                {
-                    "name": "Tiago",
-                    "id": "363294",
-                    "message": "asdas"
-                },
-                {
-                    "name": "Tomas",
-                    "id": "574048",
-                    "message": "asdas"
-                },
-                {
-                    "name": "Tiago",
-                    "id": "363294",
-                    "message": "asdas"
-                },
-                {
-                    "name": "Tomas",
-                    "id": "574048",
-                    "message": "das"
-                },
-                {
-                    "name": "Tomas",
-                    "id": "574048",
-                    "message": "xcvxc"
-                },
-                {
-                    "name": "Tiago",
-                    "id": "363294",
-                    "message": "hcgcgfh"
-                },
-                {
-                    "name": "Tiago",
-                    "id": "363294",
-                    "message": "sdgfsdagsdfgsdfgfsdbsfdgsdf"
-                },
-                {
-                    "name": "Tiago",
-                    "id": "363294",
-                    "message": "savasdvaSDVASADV"
-                },
-                {
-                    "name": "Tomas",
-                    "id": "574048",
-                    "message": "asdasda"
-                },
-                {
-                    "name": "Tiago",
-                    "id": "363294",
-                    "message": "asdaslkjdblaKJDSFbl asidkjhfgoasli jedfglaskjheg bfksahjdfblkuajs gbdfljkhasdbfouighb aslkjdfg olJSHGEDFOIHSDBVKJHH GBSDOJFHBkajsd fhbKAJEGH FBuweh fpiouahsDJKPFL Hweso[ifh [WOIEH FWPjkleh foW EHFwe"
-                },
-                {
-                    "name": "Tiago",
-                    "id": "363294",
-                    "message": "fgdf"
-                },
-                {
-                    "name": "Tiago",
-                    "id": "363294",
-                    "message": "gdfgdf"
-                },
-                {
-                    "name": "Tiago",
-                    "id": "363294",
-                    "message": "asdasd"
-                },
-                {
-                    "name": "Tomas",
-                    "id": "574048",
-                    "message": "fdsdfs"
-                },
-                {
-                    "name": "Tomas",
-                    "id": "574048",
-                    "message": "sdfsdf"
-                },
-                {
-                    "name": "Tomas",
-                    "id": "574048",
-                    "message": "fsdfsd"
-                },
-                {
-                    "name": "Tomas",
-                    "id": "574048",
-                    "message": "sdcsdfsd"
-                },
-                {
-                    "name": "Tomas",
-                    "id": "574048",
-                    "message": "sadfsdfs"
-                },
-                {
-                    "name": "Tiago",
-                    "id": "363294",
-                    "message": "dasadas"
-                },
-                {
-                    "name": "Tiago",
-                    "id": "363294",
-                    "message": "sdfsdf"
-                },
-                {
-                    "name": "Tiago",
-                    "id": "363294",
-                    "message": "sfdgdsfgdsfg"
-                },
-                {
-                    "name": "Tiago",
-                    "id": "363294",
-                    "message": "fds"
-                },
-                {
-                    "name": "Tomas",
-                    "id": "574048",
-                    "message": "ola"
-                },
-                {
-                    "name": "Tiago",
-                    "id": "363294",
-                    "message": "asdasda"
-                },
-                {
-                    "name": "Tomas",
-                    "id": "574048",
-                    "message": "fdghdsfgbdf"
-                },
-                {
-                    "name": "Tiago",
-                    "id": "363294",
-                    "message": "dvbdfbvdzf"
+                    "message": "dasdas",
+                    "time": "14:42"
                 }
             ]
         },
         {
-            "code": "KCCB",
+            "code": "RFKF",
             "members": [
                 {
-                    "name": "Tomas",
-                    "id": "574048"
+                    "name": "Tiago",
+                    "id": "363294"
                 }
             ],
             "messages": []
         },
         {
-            "code": "XZHQ",
+            "code": "ZXWQ",
             "members": [
-                {
-                    "name": "Tomas",
-                    "id": "574048"
-                },
                 {
                     "name": "Tiago",
                     "id": "363294"
-                },
-                {
-                    "name": "Luisa",
-                    "id": "838951"
                 }
             ],
             "messages": [
                 {
-                    "name": "Tomas",
-                    "id": "574048",
-                    "message": "wdeerfdsf"
-                },
-                {
                     "name": "Tiago",
                     "id": "363294",
-                    "message": "ola!"
-                },
-                {
-                    "name": "Tomas",
-                    "id": "574048",
-                    "message": "hujbijhb"
-                },
-                {
-                    "name": "Tomas",
-                    "id": "574048",
-                    "message": "ijhopjk"
-                },
-                {
-                    "name": "Tomas",
-                    "id": "574048",
-                    "message": "SERTSFD"
-                },
-                {
-                    "name": "Tomas",
-                    "id": "574048",
-                    "message": "KL\u00c7JKL"
-                },
-                {
-                    "name": "Luisa",
-                    "id": "838951",
-                    "message": "sdfsdfsf"
-                },
-                {
-                    "name": "Tiago",
-                    "id": "363294",
-                    "message": "OLA"
-                },
-                {
-                    "name": "Tomas",
-                    "id": "574048",
-                    "message": "dfgdfg"
-                },
-                {
-                    "name": "Luisa",
-                    "id": "838951",
-                    "message": "dfgdg"
-                },
-                {
-                    "name": "Tiago",
-                    "id": "363294",
-                    "message": "sadfsaedf"
-                },
-                {
-                    "name": "Tiago",
-                    "id": "363294",
-                    "message": "sdfs"
-                },
-                {
-                    "name": "Tiago",
-                    "id": "363294",
-                    "message": "adfsdv"
-                },
-                {
-                    "name": "Tiago",
-                    "id": "363294",
-                    "message": "sadfv"
-                },
-                {
-                    "name": "Tiago",
-                    "id": "363294",
-                    "message": "sda"
-                },
-                {
-                    "name": "Tiago",
-                    "id": "363294",
-                    "message": "cvsad"
+                    "message": "ascdasd",
+                    "time": "14:46"
                 }
             ]
         },
         {
-            "code": "YVGF",
-            "members": [
-                {
-                    "name": "Tomas",
-                    "id": "574048"
-                }
-            ],
-            "messages": []
-        },
-        {
-            "code": "OHQI",
+            "code": "FDHF",
             "members": [
                 {
                     "name": "Tiago",
                     "id": "363294"
-                },
-                {
-                    "name": "Tomas",
-                    "id": "574048"
                 }
             ],
             "messages": [
                 {
                     "name": "Tiago",
                     "id": "363294",
-                    "message": "ola"
-                },
-                {
-                    "name": "Tomas",
-                    "id": "574048",
-                    "message": "Hdhdh"
-                },
-                {
-                    "name": "Tiago",
-                    "id": "363294",
-                    "message": "sjdfhskjdfg"
-                },
-                {
-                    "name": "Tomas",
-                    "id": "574048",
-                    "message": "Hdhdhdh"
-                },
-                {
-                    "name": "Tiago",
-                    "id": "363294",
-                    "message": "PUTAAAAAAAAAAAAAAAAA"
+                    "message": "dfgvbdzfv",
+                    "time": "14:51"
                 }
             ]
         },
         {
-            "code": "LSTQ",
+            "code": "WWBC",
             "members": [
-                {
-                    "name": "Rodrigues",
-                    "id": "356166"
-                },
                 {
                     "name": "Tiago",
                     "id": "363294"
-                },
-                {
-                    "name": "Tomas",
-                    "id": "574048"
                 }
             ],
             "messages": [
                 {
-                    "name": "Rodrigues",
-                    "id": "356166",
-                    "message": "sao todos paneleiros"
+                    "name": "Tiago",
+                    "id": "363294",
+                    "message": "sDFVSDVcasd",
+                    "time": "14:54"
                 },
                 {
                     "name": "Tiago",
                     "id": "363294",
-                    "message": "gay"
+                    "message": "CWADSCASd",
+                    "time": "14:54"
+                }
+            ]
+        },
+        {
+            "code": "GWUQ",
+            "members": [
+                {
+                    "name": "Tiago",
+                    "id": "363294"
+                }
+            ],
+            "messages": [
+                {
+                    "name": "Tiago",
+                    "id": "363294",
+                    "message": "ACDSSADVCS",
+                    "time": "14:58"
                 },
                 {
-                    "name": "Tomas",
-                    "id": "574048",
-                    "message": "Hdufh"
+                    "name": "Tiago",
+                    "id": "363294",
+                    "message": "SDZVAS",
+                    "time": "14:58"
                 },
                 {
-                    "name": "Tomas",
-                    "id": "574048",
-                    "message": "Hdudhxh"
+                    "name": "Tiago",
+                    "id": "363294",
+                    "message": "DFV",
+                    "time": "14:58"
+                },
+                {
+                    "name": "Tiago",
+                    "id": "363294",
+                    "message": "SAFDV",
+                    "time": "14:58"
+                },
+                {
+                    "name": "Tiago",
+                    "id": "363294",
+                    "message": "ASDF",
+                    "time": "14:58"
+                },
+                {
+                    "name": "Tiago",
+                    "id": "363294",
+                    "message": "VAS",
+                    "time": "14:58"
+                }
+            ]
+        },
+        {
+            "code": "HMEF",
+            "members": [
+                {
+                    "name": "Tiago",
+                    "id": "363294"
+                }
+            ],
+            "messages": [
+                {
+                    "name": "Tiago",
+                    "id": "363294",
+                    "message": "ASDFSDLKJfblasvdkjv",
+                    "time": "15:00"
+                },
+                {
+                    "name": "Tiago",
+                    "id": "363294",
+                    "message": "sadvjbkSALKJHDFBVSADBLKHJSD",
+                    "time": "15:00"
+                },
+                {
+                    "name": "Tiago",
+                    "id": "363294",
+                    "message": "VcSDVBASLDKJVBAS",
+                    "time": "15:00"
+                },
+                {
+                    "name": "Tiago",
+                    "id": "363294",
+                    "message": "ASDVJKBASFD",
+                    "time": "15:00"
+                }
+            ]
+        },
+        {
+            "code": "RYVO",
+            "members": [
+                {
+                    "name": "Tiago",
+                    "id": "363294"
+                }
+            ],
+            "messages": [
+                {
+                    "name": "Tiago",
+                    "id": "363294",
+                    "message": "SADFVASDVASFD",
+                    "time": "15:02"
+                },
+                {
+                    "name": "Tiago",
+                    "id": "363294",
+                    "message": "ASDVASD",
+                    "time": "15:02"
+                },
+                {
+                    "name": "Tiago",
+                    "id": "363294",
+                    "message": "ASDF",
+                    "time": "15:02"
+                },
+                {
+                    "name": "Tiago",
+                    "id": "363294",
+                    "message": "ASDV",
+                    "time": "15:02"
+                },
+                {
+                    "name": "Tiago",
+                    "id": "363294",
+                    "message": "ASDVF",
+                    "time": "15:02"
+                },
+                {
+                    "name": "Tiago",
+                    "id": "363294",
+                    "message": "ASDF",
+                    "time": "15:02"
+                },
+                {
+                    "name": "Tiago",
+                    "id": "363294",
+                    "message": "VFASD",
+                    "time": "15:02"
                 }
             ]
         }

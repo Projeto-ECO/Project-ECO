@@ -119,7 +119,7 @@ $(function() {
         if (!requestSent_) {
             // Prevent default form submission behavior
             event.preventDefault();
-        
+
             // Get form data
             var formData = {
                 'coin-withdrawl': $('#coin-withdrawl').val(),

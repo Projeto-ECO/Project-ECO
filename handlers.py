@@ -210,6 +210,7 @@ def check_if_online(username):
     for user in data["users"]:
         if user["username"] == username:
             return user["active"]
+    return
 
 def check_image_existence(id):
     directory = os.getcwd()
@@ -251,6 +252,7 @@ def inactivate_user(id):
         if user["id"] == id:
             user["active"] = False
             write_json("\\db_handler\\users.json", data)
+            print(f"User {id} has been inactivated")
             return True
     return False
 
@@ -538,4 +540,28 @@ def delete_room(id):
             rooms.remove(room)
             write_json("\\db_handler\\rooms.json", data)
             return True
+    return False
+
+def set_activity_timer(id):
+    data = read_json("\\db_handler\\users.json")
+    for user in data["users"]:
+        if user["id"] == id:
+            user["last_activity"] = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+            write_json("\\db_handler\\users.json", data)
+            return True
+    return False
+
+
+def last_activity_check(id):
+    data = read_json("\\db_handler\\users.json")
+    for user in data["users"]:
+        if user["id"] == id and user["last_activity"] != None:
+            last_activity = datetime.strptime(user["last_activity"], "%d-%m-%Y %H:%M:%S")
+            now = datetime.now()
+            difference = now - last_activity
+            if difference.total_seconds() > 300: # 5 minutes
+                inactivate_user(id)
+                return False
+            else:
+                return True
     return False

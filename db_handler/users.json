@@ -5,28 +5,40 @@
             "password": "1656",
             "email": "t.fonseca@ua.pt",
             "id": "363294",
-            "active": true
+            "active": false,
+            "last_activity": "26-04-2023 17:09:57"
         },
         {
             "username": "Tomas",
             "password": "1647",
             "email": "tomasfonseca14@ua.pt",
             "id": "574048",
-            "active": false
+            "active": false,
+            "last_activity": "26-04-2023 17:09:57"
         },
         {
             "username": "Luisa",
             "password": "1234",
             "email": "pockettomas2002@gmail.com",
             "id": "838951",
-            "active": false
+            "active": false,
+            "last_activity": "26-04-2023 17:09:57"
         },
         {
             "username": "Rodrigues",
             "password": "tiago123",
             "email": "tiagosrodrigues18@gmail.com",
             "id": "356166",
-            "active": false
+            "active": false,
+            "last_activity": "26-04-2023 17:09:57"
+        },
+        {
+            "username": "Tito",
+            "password": "1656",
+            "email": "tiagofonseca2002@hotmail.com",
+            "id": "671884",
+            "active": false,
+            "last_activity": "26-04-2023 17:13:03"
         }
     ]
 }

@@ -2,10 +2,14 @@ var socketio = io();
 const messages = document.getElementById("messages");
 
 socketio.on("message", (data) => {
-    createMessage(data.name, data.message, imagePath);
+    createMessage(data.time, data.name, data.message, imagePath);
 });
 
-const createMessage = (name, msg, imgSrc) => {
+socketio.on("disconnect", () => {
+    socketio.emit("disconnect", { place: "chat" });
+});
+
+const createMessage = (time, name, msg, imgSrc) => {
     const isCurrentUser = currentUser == name;
     console.log(isCurrentUser);
     const messageClass = isCurrentUser ? 'current-user' : '';
@@ -26,7 +30,7 @@ const createMessage = (name, msg, imgSrc) => {
                 ${senderContent}
             </div>
             <div class="${textClass}">${msg.replace(/\n/g, "<br>")}</div>
-            <div class="${mutedClass}">${new Date().toLocaleString()}</div>
+            <div class="${mutedClass}">${time}</div>
             <br>
         </div>
     `;

@@ -1,5 +1,5 @@
-from flask import Flask
-from views import views, new_message, on_connect, on_disconnect
+from flask import Flask, request
+from views import views, new_message, on_connect, on_disconnect, inactivate_account, activate_account
 from flask_socketio import SocketIO
 
 
@@ -11,22 +11,30 @@ socketio = SocketIO(app)
 
 @socketio.on("connect")
 def connect(auth):
-    print("conectou")
-    on_connect(auth)
+    place = request.referrer.split("/")[-2]
+    if "chat" in place:
+        on_connect(auth, place)
+    elif place == "profile":
+        place += "/" + request.referrer.split("/")[-1]
+        on_connect(auth, place)
+        place = place.split("/")[-1]
+    print("Connect: ", place)
 
 
 
 @socketio.on("message")
 def message(data):
-    print(data)
     new_message(data)
 
 
 
 @socketio.on("disconnect")
 def disconnect():
-    print("desconectou")
-    on_disconnect()
+    place = request.referrer.split("/")[-2]
+    if place == "profile":
+        place += "/" + request.referrer.split("/")[-1]
+    print("Disconnect: ", place)
+    on_disconnect(place)
 
 
 
