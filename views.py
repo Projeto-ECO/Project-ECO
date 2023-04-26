@@ -253,6 +253,10 @@ def account(username):
     set_activity_timer(get_id_by_username(username))
     return render_template("account.html", username=username, id=get_id_by_username(username))
 
+@views.route("/accounts/<id>/<image>", methods=["POST", "GET"])
+def account_image(id, image):
+    return send_file(os.getcwd()+f"/accounts/{id}/{image}", mimetype='image/png')
+
 
 @views.route('/get_image/<path:filename>')
 def get_image(filename):
@@ -345,6 +349,9 @@ def chat_room(id):
     if room is None or check_room_code_exists(room) == False:
         return redirect(url_for("views.chat_home", id=id))
     messages = get_room_messages(room)
+    for element in messages:
+        element["image"] = element["image"].replace("\\", "/")
+    print(messages)
     return render_template("chat_room.html", code=room, messages=messages, id=id, name=get_username_by_id(id))
 
 
@@ -362,7 +369,8 @@ def new_message(data):
         "name": name,
         "id" : data["name"],
         "message": data["message"],
-        "time": strftime("%H:%M", localtime())
+        "time": strftime("%H:%M", localtime()),
+        "image": get_image_path(data["name"])
     }
     send(content, to=room)
     add_room_message(room, content)
@@ -392,8 +400,7 @@ def on_connect(auth, place):
         
         join_room(room)
         print(f"{name} joined room {room}")
-        send({"name": name, "id": get_id_by_username(name), "message": name+" has entered the room", "time": strftime("%H:%M", localtime())}, to=room)
-
+        send({"name": name, "id": get_id_by_username(name), "message": name+" has entered the room", "time": strftime("%H:%M", localtime()), "image":get_image_path(get_id_by_username(name))}, to=room)
         add_room_member(room, name, get_id_by_username(name))
         print(f"{name} joined room {room}")
 
@@ -420,8 +427,7 @@ def on_disconnect(place):
             if get_number_of_room_members(room) <= 0:
                 print(f"Room {room} has no members")
                 delete_room(room)
-
-        send({"name": name, "message": name + " has left the room"}, to=room)
+        send({"name": name, "id": get_id_by_username(name), "message": name+" has left the room", "time": strftime("%H:%M", localtime()), "image":get_image_path(get_id_by_username(name))}, to=room)
         print(f"{name} has left the room {room}")
         leave_room(room)
     else:

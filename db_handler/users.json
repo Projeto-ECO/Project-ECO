@@ -5,8 +5,8 @@
             "password": "1656",
             "email": "t.fonseca@ua.pt",
             "id": "363294",
-            "active": false,
-            "last_activity": "26-04-2023 17:09:57"
+            "active": true,
+            "last_activity": "27-04-2023 00:45:44"
         },
         {
             "username": "Tomas",
@@ -37,8 +37,8 @@
             "password": "1656",
             "email": "tiagofonseca2002@hotmail.com",
             "id": "671884",
-            "active": false,
-            "last_activity": "26-04-2023 17:13:03"
+            "active": true,
+            "last_activity": "27-04-2023 00:53:49"
         }
     ]
 }

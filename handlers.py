@@ -565,3 +565,7 @@ def last_activity_check(id):
             else:
                 return True
     return False
+
+
+def get_image_path(id):
+    return f"\\accounts\\{id}\\{id}.png"

@@ -2,7 +2,7 @@ var socketio = io();
 const messages = document.getElementById("messages");
 
 socketio.on("message", (data) => {
-    createMessage(data.time, data.name, data.message, imagePath);
+    createMessage(data.time, data.name, data.message, data.image);
 });
 
 socketio.on("disconnect", () => {
@@ -10,6 +10,7 @@ socketio.on("disconnect", () => {
 });
 
 const createMessage = (time, name, msg, imgSrc) => {
+    console.log(time, name, msg, imgSrc);
     const isCurrentUser = currentUser == name;
     console.log(isCurrentUser);
     const messageClass = isCurrentUser ? 'current-user' : '';
