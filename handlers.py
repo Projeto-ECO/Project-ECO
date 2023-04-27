@@ -28,8 +28,12 @@ def send_email(to, subject, body):
     pythoncom.CoUninitialize()
     return True
 
-def send_two_factor_auth_code(to, code):
-    email = search_user_by_username(to)["email"]
+def send_two_factor_auth_code(to, code, op):
+    if op == "login":
+        email = search_user_by_username(to)["email"]
+    else:
+        email = to["email"]
+        to = to["username"]
     send_email(email, "Two Factor Authentication Code",
         """
             <html>
@@ -559,13 +563,102 @@ def last_activity_check(id):
             last_activity = datetime.strptime(user["last_activity"], "%d-%m-%Y %H:%M:%S")
             now = datetime.now()
             difference = now - last_activity
-            if difference.total_seconds() > 300: # 5 minutes
+            print(difference)
+            print(difference.total_seconds())
+            if difference.total_seconds() > 120: # 5 minutes
                 inactivate_user(id)
                 return False
             else:
+                set_activity_timer(id)
                 return True
     return False
 
 
 def get_image_path(id):
     return f"\\accounts\\{id}\\{id}.png"
+
+
+def create_user(username, password, email):
+    id = str(generate_random_id())
+    data_to_add = {"username": username, "password": password, "email": email, "id" : id, "active" : False, "last_activity" : None}
+    data = read_json("\\db_handler\\users.json")
+    data["users"].append(data_to_add)
+    write_json("\\db_handler\\users.json", data)
+    json_coins = {
+                    "coins": [
+                        {
+                            "name": "0.01",
+                            "value": 0.01
+                        },
+                        {
+                            "name": "0.02",
+                            "value": 0.02
+                        },
+                        {
+                            "name": "0.05",
+                            "value": 0.05
+                        },
+                        {
+                            "name": "0.10",
+                            "value": 0.10
+                        },
+                        {
+                            "name": "0.20",
+                            "value": 0.20
+                        },
+                        {
+                            "name": "0.50",
+                            "value": 0.00
+                        },
+                        {
+                            "name": "1.00",
+                            "value": 1.00
+                        },
+                        {
+                            "name": "2.00",
+                            "value": 2.00
+                        },
+                        {
+                            "name": "5.00",
+                            "value": 0.00
+                        },
+                        {
+                            "name": "10.00",
+                            "value": 10.00
+                        },
+                        {
+                            "name": "20.00",
+                            "value": 20.00
+                        },
+                        {
+                            "name": "50.00",
+                            "value": 50.00
+                        },
+                        {
+                            "name": "100.00",
+                            "value": 100.00
+                        },
+                        {
+                            "name": "200.00",
+                            "value": 200.00
+                        }
+                    ],
+                    "coinAmounts": {
+                        "0.01": 0,
+                        "0.02": 0,
+                        "0.05": 0,
+                        "0.10": 0,
+                        "0.20": 0,
+                        "0.50": 0,
+                        "1.00": 0,
+                        "2.00": 0,
+                        "5.00": 0,
+                        "10.00": 0,
+                        "20.00": 0,
+                        "50.00": 0,
+                        "100.00": 0,
+                        "200.00": 0 
+                    }
+                }
+    create_user_folder(id)
+    write_json("\\accounts\\"+id+"\\"+id+".json", json_coins)

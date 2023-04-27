@@ -71,6 +71,19 @@ def two_factor_auth_login(username):
     return redirect(url_for("views.login"))
 
 
+@views.route("/two-factor-auth-signup/", methods=["GET", "POST"])
+def two_factor_auth_signup():
+    code = session.get("code_signup")
+    password = session.get("password_signup")
+    username = session.get("username_signup")
+    email = session.get("email_signup")
+    if request.method == "POST":
+        entered_code = request.form.get("code_signup")
+        if entered_code == code:
+            create_user(username, password, email)
+            return redirect(url_for("views.login", username=username))
+    return render_template("two-factor-auth-signup.html")
+
 
 @views.route("/login", methods=["GET", "POST"])
 def login():
@@ -86,7 +99,7 @@ def login():
             session["code"] = code
             session["username"] = username
             session["id"] = get_id_by_username(username)
-            send_two_factor_auth_code(username, code)
+            send_two_factor_auth_code(username, code, "login")
             return redirect(url_for("views.two_factor_auth_login", username = username))
     else:
         return render_template("login.html")
@@ -124,90 +137,14 @@ def signup():
         if search_user_by_email(email) != None or search_user_by_username(username) != None:
             return render_template("signup.html", message="User already exists.")
         else:
-            id = str(generate_random_id())
-            data_to_add = {"username": username, "password": password, "email": email, "id" : id, "active" : False, "last_activity" : None}
-            data = read_json("\\db_handler\\users.json")
-            data["users"].append(data_to_add)
-            write_json("\\db_handler\\users.json", data)
-            json_coins = {
-                            "coins": [
-                                {
-                                    "name": "0.01",
-                                    "value": 0.01
-                                },
-                                {
-                                    "name": "0.02",
-                                    "value": 0.02
-                                },
-                                {
-                                    "name": "0.05",
-                                    "value": 0.05
-                                },
-                                {
-                                    "name": "0.10",
-                                    "value": 0.10
-                                },
-                                {
-                                    "name": "0.20",
-                                    "value": 0.20
-                                },
-                                {
-                                    "name": "0.50",
-                                    "value": 0.00
-                                },
-                                {
-                                    "name": "1.00",
-                                    "value": 1.00
-                                },
-                                {
-                                    "name": "2.00",
-                                    "value": 2.00
-                                },
-                                {
-                                    "name": "5.00",
-                                    "value": 0.00
-                                },
-                                {
-                                    "name": "10.00",
-                                    "value": 10.00
-                                },
-                                {
-                                    "name": "20.00",
-                                    "value": 20.00
-                                },
-                                {
-                                    "name": "50.00",
-                                    "value": 50.00
-                                },
-                                {
-                                    "name": "100.00",
-                                    "value": 100.00
-                                },
-                                {
-                                    "name": "200.00",
-                                    "value": 200.00
-                                }
-                            ],
-                            "coinAmounts": {
-                                "0.01": 0,
-                                "0.02": 0,
-                                "0.05": 0,
-                                "0.10": 0,
-                                "0.20": 0,
-                                "0.50": 0,
-                                "1.00": 0,
-                                "2.00": 0,
-                                "5.00": 0,
-                                "10.00": 0,
-                                "20.00": 0,
-                                "50.00": 0,
-                                "100.00": 0,
-                                "200.00": 0 
-                            }
-                        }
-            create_user_folder(id)
-            write_json("\\accounts\\"+id+"\\"+id+".json", json_coins)
-            return redirect(url_for("views.login", username=username))
+            code = generate_two_factor_auth_code()
+            session["code_signup"] = code
+            session["username_signup"] = username
+            session["email_signup"] = email
+            session["password_signup"] = password
+            content = {"username": username, "email": email}
+            send_two_factor_auth_code(content, code, "signup")
+            return redirect(url_for("views.two_factor_auth_signup"))
     else:
         return render_template("signup.html")
 
