@@ -1,3 +1,9 @@
-code-ILGS join- create-False
-entrou-ILGS {'name': '671884', 'message': 'SFDVZDSF'}
-entrou-ILGS {'name': '363294', 'message': 'ola'}
+code-MDXZ join- create-False
+entrou-MDXZ {'name': '671884', 'message': 'asdasda'}
+entrou-MDXZ {'name': '671884', 'message': 'sdfvsd'}
+entrou-MDXZ {'name': '363294', 'message': 'dsfsdvdsvs'}
+entrou-MDXZ {'name': '363294', 'message': 'sdvs'}
+entrou-MDXZ {'name': '671884', 'message': 'vds'}
+entrou-MDXZ {'name': '363294', 'message': 'vsd'}
+entrou-MDXZ {'name': '671884', 'message': 'vds'}
+entrou-MDXZ {'name': '363294', 'message': 'vdsvs'}

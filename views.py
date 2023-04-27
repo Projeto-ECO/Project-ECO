@@ -369,7 +369,7 @@ def new_message(data):
         "name": name,
         "id" : data["name"],
         "message": data["message"],
-        "time": strftime("%H:%M", localtime()),
+        "time": strftime("%d-%m-%Y %H:%M", localtime()),
         "image": get_image_path(data["name"])
     }
     send(content, to=room)
@@ -400,7 +400,7 @@ def on_connect(auth, place):
         
         join_room(room)
         print(f"{name} joined room {room}")
-        send({"name": name, "id": get_id_by_username(name), "message": name+" has entered the room", "time": strftime("%H:%M", localtime()), "image":get_image_path(get_id_by_username(name))}, to=room)
+        send({"name": name, "id": get_id_by_username(name), "message": name+" has entered the room", "time": strftime("%d-%m-%Y %H:%M", localtime()), "image":get_image_path(get_id_by_username(name))}, to=room)
         add_room_member(room, name, get_id_by_username(name))
         print(f"{name} joined room {room}")
 
@@ -427,7 +427,7 @@ def on_disconnect(place):
             if get_number_of_room_members(room) <= 0:
                 print(f"Room {room} has no members")
                 delete_room(room)
-        send({"name": name, "id": get_id_by_username(name), "message": name+" has left the room", "time": strftime("%H:%M", localtime()), "image":get_image_path(get_id_by_username(name))}, to=room)
+        send({"name": name, "id": get_id_by_username(name), "message": name+" has left the room", "time": strftime("%d-%m-%Y %H:%M", localtime()), "image":get_image_path(get_id_by_username(name))}, to=room)
         print(f"{name} has left the room {room}")
         leave_room(room)
     else:

@@ -53,7 +53,7 @@ def send_two_factor_auth_code(to, code):
             </head>
             <body>
                 <h1>Two Factor Authentication Code</h1>
-                <p>Hello, Tiago</p>
+                <p>Hello, {to}</p>
                 <p>Your login code is: <strong>{code}</strong></p>
             </body>
             </html>
