@@ -565,7 +565,7 @@ def last_activity_check(id):
             difference = now - last_activity
             print(difference)
             print(difference.total_seconds())
-            if difference.total_seconds() > 120: # 5 minutes
+            if difference.total_seconds() > 600: # 10 minutes
                 inactivate_user(id)
                 return False
             else:

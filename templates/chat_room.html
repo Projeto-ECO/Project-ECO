@@ -10,12 +10,15 @@
         </div>
         <div class="inputs">
             <textarea rows="3" placeholder="Message" name="message" id="message" data-id="{{ id }}" data-name="{{ name }}"></textarea>
-            <button type="button" name="send" id="send-btn" onClick="sendMessage('{{ id }}', '{{ name }}')">Send</button>
+            <button type="button" style="margin-top: 0px; padding: 0px; width: 40px; height: 40px; border-radius: 50%" name="send" id="send-btn" onClick="sendMessage('{{ id }}', '{{ name }}')">
+                <img src="{{ url_for('static', filename='images/send.png') }}" alt="Send" style="height: 20px; width: 20px;">
+            </button>            
         </div>
     </div>
 </div>
 <script>
     var currentUser = "{{ name }}";
+    var image = "{{url_for('static', filename='images/send.png')}}"
 </script>
 <script type="text/javascript" src="{{url_for('static', filename='chat.js')}}"></script>
 {% for msg in messages %}
@@ -24,4 +27,5 @@
 </script>
 {% endfor %}
 {% endblock %}
+
 

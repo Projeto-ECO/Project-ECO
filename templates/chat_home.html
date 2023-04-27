@@ -2,10 +2,10 @@
 <form method="post" class="buttons">
     <h3>Enter The Chat Room</h3>
     <div class="join">
-        <input style="margin-right: 5px;" type="text" placeholder="Room Code" name="code" value="{{code}}" />
-        <button type="submit" name="join">Join a Room</button>
+        <input style="margin-right: 5px; margin-top: 14px; border-color: transparent;" type="text" placeholder="Room Code" name="code" value="{{code}}" />
+        <button type="submit" name="join" style="background-color: rgb(77, 155, 75); border-color: transparent;">Join a Room</button>
     </div>
-    <button type="submit" name="create" class="create-btn">Create a Room</button>
+    <button type="submit" name="create" class="create-btn" style="background-color: rgb(77, 155, 75); border-color: transparent;">Create a Room</button>
     {% if error %}
     <ul>
         <li>{{error}}</li>

@@ -1,4 +1,5 @@
 from time import localtime, strftime
+import time
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for, session, send_file
 from handlers import *
 from flask_socketio import send, leave_room, join_room
@@ -361,6 +362,7 @@ def on_disconnect(place):
                     write_json("\\db_handler\\rooms.json", data)
                     break
             room = session.get("room")
+            time.sleep(5)
             if get_number_of_room_members(room) <= 0:
                 print(f"Room {room} has no members")
                 delete_room(room)
