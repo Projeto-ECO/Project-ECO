@@ -119,6 +119,7 @@ $(function() {
         if (!requestSent_) {
             // Prevent default form submission behavior
             event.preventDefault();
+            event.stopPropagation();
 
             // Get form data
             var formData = {

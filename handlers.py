@@ -85,10 +85,12 @@ def read_json(filename):
 
 def write_json(file, data):
     directory = os.getcwd()
-    if not os.path.exists(directory+file[1:file.rfind("\\")]):
-        os.makedirs(directory+file[1:file.rfind("\\")])
-    with open(directory+file, "w+") as file:
-            json.dump(data, file, indent=4)
+    file_dir = file.split("\\")[0]
+    if not os.path.exists(directory+file_dir):
+        os.makedirs(directory+file_dir)
+        print("Created file: ", directory+file_dir)
+    with open(directory+file, "w+") as f:
+        json.dump(data, f, indent=4)
     return True
 
 def search_user_by_id(id):
@@ -136,6 +138,8 @@ def validate_login(username, password):
 
 def send_recovery_password(email):
     user = search_user_by_email(email)
+    name = user["username"]
+    password = user["password"]
     if user is None:
         return False
     else:
@@ -144,21 +148,21 @@ def send_recovery_password(email):
         email = outlook.CreateItem(0)
         email.To = user["email"]
         email.Subject = "Recover your password"
-        email.HTMLBody = """
+        email.HTMLBody = f"""
                             <html>
                             <head>
                                 <style>
-                                body {
+                                body {{
                                     font-family: Arial, sans-serif;
                                     font-size: 14px;
                                     color: #333;
-                                }
-                                h1 {
+                                }}
+                                h1 {{
                                     color: #007bff;
-                                }
-                                p {
+                                }}
+                                p {{
                                     margin-bottom: 10px;
-                                }
+                                }}
                                 </style>
                             </head>
                             <body>
@@ -237,7 +241,7 @@ def banking_operations(id, operation, coin, amount):
                     break
                 else:
                     return False
-    elif operation == "withdraw":
+    elif operation == "withdrawl":
         for coin_ in data["coins"]:
             if str(coin_["name"]) == str(coin) and data["coinAmounts"][coin] >= amount and amount > 0:
                 if register_operation(id, operation, coin, amount):
@@ -287,13 +291,13 @@ def register_operation(id, operation, coin, amount):
             total = float(coin) * float(amount)
             if operation == "deposit":
                 accountBalance += total
-            elif operation == "withdraw":
+            elif operation == "withdrawl":
                 accountBalance -= total
                 total = -total
             else:
                 return False
             statement_row = [datetime.now().strftime('%d-%m-%Y %H:%M:%S'), operation.title(), coin+" €", amount, "{:.2f}".format(total)+" €", "{:.2f}".format(accountBalance)+" €"]
-            with open(directory+f"\\accounts\\{id}\\{id}.csv", "a+", newline="") as file:
+            with open(directory+f"\\accounts\\{id}\\{id}.csv", "a+", newline="", encoding="utf8") as file:
                 csv_reader = csv.reader(file)
                 existing_rows = [row for row in csv_reader]
                 if statement_row not in existing_rows:
@@ -321,13 +325,16 @@ def get_account_balance(id):
 
 
 def csv_to_pdf(csv_path, id):
+
+    if not check_statement_existence(id):
+        return False
     
     # Set up input and output paths
     input_path = csv_path
     output_path = csv_path[:-3] + "pdf"
 
     # Read the CSV file and convert it to a list of rows
-    with open(input_path, "r") as f:
+    with open(input_path, "r", encoding="utf8") as f:
         rows = [row.strip().split(",") for row in f]
 
     # Define the table style
@@ -354,7 +361,7 @@ def csv_to_pdf(csv_path, id):
     table.setStyle(style)
 
     # Create the PDF document and add the table to it
-    doc = SimpleDocTemplate(output_path, pagesize=letter)
+    doc = SimpleDocTemplate(output_path, pagesize=letter, encoding = "utf-8")
 
     # Create the logo image object
     logo_path = os.getcwd()+f"\\static\\images\\Eco.png"

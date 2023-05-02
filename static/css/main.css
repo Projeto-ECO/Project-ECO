@@ -220,16 +220,28 @@ iframe {
 }
 
 .input100 {
-  font-family: Poppins-Medium;
-  font-size: 10px;
-  color: #333333;
+  font-family: Poppins-Regular;
+  font-size: 13px;
+  color: whitesmoke;
+  background-color: rgb(56, 102, 55);
   line-height: 1.2;
-
   display: block;
   width: 100%;
   height: 55px;
-  background: transparent;
-  padding: 0 7px 0 px;
+  padding: 0 7px 0px;
+  z-index: 1;
+  border-radius: 10px;
+  text-align: center;
+}
+
+input::placeholder {
+  color: whitesmoke;
+  font-family: Poppins-Regular;
+  font-size: 11px;
+}
+
+input:hover {
+  caret-color: rgb(77, 155, 75);
 }
 
 
@@ -469,4 +481,4 @@ iframe {
     padding-left: 15px;
     padding-right: 15px;
   }
-} 
+}

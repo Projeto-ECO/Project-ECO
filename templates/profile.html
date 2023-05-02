@@ -40,7 +40,7 @@
                                 <li><a id="deposit-button">Deposit</a></li>
                                 <li><a id="withdrawl-button">Withdrawl</a></li>
                                 <li><a href="/download_pdf/{{id}}">Statement</a></li>
-                                <li><a href="/" id="logout-button">Logout</a></li>
+                                <li><a href="/logout" id="logout-button">Logout</a></li>
                             </ul>
                         </div>
                     </div>               
@@ -48,38 +48,38 @@
             </div>
         </nav>
 
-        <div id="deposit-modal" class="modal">
-            <div class="modal-content">
+        <div id="deposit-modal" class="modal" style="width: 600px;">
+            <div class="modal-content" style="border-radius: 10px;">
                 <span class="close">&times;</span>
-                <h2 style="color: rgb(77, 155, 75);">Deposit</h2>
+                <h2 style="color: rgb(77, 155, 75); margin-bottom: 15px; margin-left: 17px;">Deposit</h2>
                 <form id="deposit-form" method="post">
                     <label for="coin" style="color: rgb(77, 155, 75);">Coin:</label>
                     <br>    
-                        <input type="text" id="coin-deposit" name="coin-deposit" required>
+                        <input type="text" id="coin-deposit" name="coin-deposit" style="border: none;" required>
                     <br>
                     <label for="amount" style="color: rgb(77, 155, 75);">Amount:</label>
                     <br>
-                        <input type="number" id="amount-deposit" name="amount-deposit" required>
+                        <input type="number" id="amount-deposit" name="amount-deposit" style="border: none;" required>
                     <br>
-                    <button>Sumbit</button>
+                    <button style="background-color: rgb(77, 155, 75); border: none;">Sumbit</button>
                 </form>
             </div>
         </div>
 
-        <div id="withdrawl-modal" class="modal">
-            <div class="modal-content">
+        <div id="withdrawl-modal" class="modal" style="width: 600px;">
+            <div class="modal-content" style="border-radius: 10px;">
                 <span class="close">&times;</span>
-                <h2 style="color: rgb(77, 155, 75);">Withdrawl</h2>
+                <h2 style="color: rgb(77, 155, 75); margin-bottom: 15px; margin-left: 17px;">Withdrawl</h2>
                 <form id="withdrawl-form" method="POST">
                     <label for="coin" style="color: rgb(77, 155, 75);">Coin:</label>
                     <br>
-                        <input type="text" id="coin-withdrawl" name="coin-withdrawl" required>
+                        <input type="text" id="coin-withdrawl" name="coin-withdrawl" style="border: none;" required>
                     <br>
                     <label for="amount" style="color: rgb(77, 155, 75);">Amount:</label>
                     <br>
-                        <input type="number" id="amount-withdrawl" name="amount-withdrawl" required>
+                        <input type="number" id="amount-withdrawl" name="amount-withdrawl" style="border: none;" required>
                     <br>
-                    <button>Sumbit</button>
+                    <button style="background-color: rgb(77, 155, 75); border: none;">Sumbit</button>
                 </form>
             </div>
         </div>
@@ -116,6 +116,9 @@
     </body>
     <script type="text/javascript">
         var name_ = "{{name}}";
+    </script>
+    <script type="text/javascript">
+        var id_ = "{{id}}";
     </script>
     <script type="text/javascript">searchUsers()</script>
     <script type="text/javascript">openChatWithUser({name})</script>

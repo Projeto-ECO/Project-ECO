@@ -161,11 +161,16 @@ Atributo style {
 
 /* Modal Content/Box */
 .modal-content {
-background-color: #fefefe;
-margin: 15% auto; /* 15% from the top and centered */
-padding: 20px;
-border: 1px solid #888;
-width: 80%; /* Could be more or less, depending on screen size */
+    background-color: #fefefe;
+    margin: 16.5% auto; /* 15% from the top and centered */
+    margin-top: 51%;
+    margin-left: 25%;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 70%; /* Could be more or less, depending on screen size */
+    background-color: transparent;
+    border-color: white;
+    transition: all 0.5s ease;
 }
 
 /* The Close Button */

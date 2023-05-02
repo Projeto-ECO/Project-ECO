@@ -9,8 +9,8 @@ views = Blueprint(__name__, "views")
 
 
 @views.route("/")
-def home():
-    return render_template("home.html")
+def index():
+    return render_template("index.html")
 
 
 @views.route("/profile/<username>")
@@ -23,16 +23,16 @@ def profile(username):
         id=get_id_by_username(username)
         print("ID----------->"+id)
         if id is None:
-            return redirect(url_for("views.home"))
+            return redirect(url_for("views.index"))
         elif last_activity_check(id):
             if check_image_existence(id):
                 return render_template("profile.html", name=username, id=id, activity_status=activity_status, image_number = id)
             else:
                 return render_template("profile.html", name=username, id=id, activity_status=activity_status, image_number = "default")
         else:
-            return redirect(url_for("views.home"))
+            return redirect(url_for("views.index"))
     else:
-        return redirect(url_for("views.home"))
+        return redirect(url_for("views.index"))
 
 
 @views.route("db_handler/users.json")
@@ -47,7 +47,7 @@ def get_data(id):
 
 @views.route("/go-to-home")
 def go_to_home():
-    return redirect(url_for("views.home"))
+    return redirect(url_for("views.index"))
 
 
 @views.route("/two-factor-auth-login/<username>", methods=["GET", "POST"])
@@ -107,9 +107,11 @@ def login():
 
 @views.route("/logout", methods=["POST"])
 def logout():
+    print(session.get("id"))
+    print(session.get("username"))
     if inactivate_user( session.get("id")):
         session.clear()
-        return redirect(url_for("views.home"))
+        return redirect(url_for("views.index"))
     else:
         return redirect(url_for("views.profile", username=session.get("username")))
 
@@ -168,7 +170,7 @@ def withdrawl(name):
     if "," in coin:
         coin = coin.replace(",", ".")
     amount = request.form.get("amount-withdrawl")
-    banking_operations(get_id_by_username(name), "withdraw", coin, amount)
+    banking_operations(get_id_by_username(name), "withdrawl", coin, amount)
     set_activity_timer(get_id_by_username(name))
     return redirect(url_for("views.profile", username=name))
 
@@ -216,13 +218,15 @@ def update_account(id):
     username = request.form.get("username")
     email = request.form.get("email")
     password = request.form.get("psw")
-    if username != "":
+    if username != "" and not check_username_exists(username):
         update_username(id, username)
         session["username"] = username
     else:
         username = search_user_by_id(id)["username"]
-    if email != "":
+    if email != "" and not check_email_exists(email):
         update_email(id, email)
+    else:
+        email = search_user_by_id(id)["email"]
     if password != "":
         update_password(id, password)
     set_activity_timer(id)
@@ -262,21 +266,24 @@ def chat_home(id):
         if join != False and not code:
             with open("cenas.txt", "a+") as f:
                 f.write("\nentrou")
-            return render_template("chat_home.html", error="Please enter a room code.", code=code, name=id)
+            username = get_username_by_id(id)
+            return render_template("chat_home.html", error="Please enter a room code.", code=code, name=id, username=username)
         
 
         room_code = code
         if create != False:
             room_code = create_room()
         elif check_room_code_exists(code) == False:
-            return render_template("chat_home.html", error="Room does not exist.", code=code, name=id)
+            username = get_username_by_id(id)
+            return render_template("chat_home.html", error="Room does not exist.", code=code, name=id, username=username)
         
         session["room"] = room_code
         session["name"] = get_username_by_id(id)
         set_activity_timer(id)
         return redirect(url_for("views.chat_room", id = id, name  = session.get("name")))
 
-    return render_template("chat_home.html")
+    username = get_username_by_id(id)
+    return render_template("chat_home.html", code="", name=id, username=username)
 
 
 @views.route("/chat_room/<id>")
@@ -323,6 +330,7 @@ def on_connect(auth, place):
         session["username"] = name
         session["id"] = id
         activate_user(id)
+        print(f"{name} connected to profile")
         return
     elif "chat_room" in place:
         room = session.get("room")
@@ -340,7 +348,6 @@ def on_connect(auth, place):
         print(f"{name} joined room {room}")
         send({"name": name, "id": get_id_by_username(name), "message": name+" has entered the room", "time": strftime("%d-%m-%Y %H:%M", localtime()), "image":get_image_path(get_id_by_username(name))}, to=room)
         add_room_member(room, name, get_id_by_username(name))
-        print(f"{name} joined room {room}")
 
 
 
@@ -353,6 +360,7 @@ def on_disconnect(place):
     elif "chat_room" in place:
         room = session.get("room")
         name = session.get("name")
+        print(f"{name} disconnected from room {room}")
 
         if check_room_code_exists(room):
             data = read_json("\\db_handler\\rooms.json")

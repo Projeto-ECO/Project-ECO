@@ -22,6 +22,7 @@
     width: 100%;
 }
 
+
 .message-box {
     border-color: transparent;
     border-width: 2px;
@@ -36,6 +37,7 @@
     max-width: 932px;
 }
 
+
 .messages {
     overflow-y: scroll;
     flex: 1;
@@ -45,9 +47,8 @@
     -ms-overflow-style: none;
     margin: 1em 0;
     overflow-x: hidden;
-    height: 400px;
-    overflow: auto;
     max-width: 932px;
+    word-break: break-word;
 }
 
 .sender {
@@ -195,4 +196,32 @@ textarea {
     color: whitesmoke;
     font-size: 10px;
     margin-top: 3px;
+}
+
+
+.profile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 30px;
+}
+.username {
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 10px;
+}
+.buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.join,
+.create-btn {
+    margin-top: 10px;
+}
+
+
+.chat {
+    margin-top: 100px;
+    overflow-y: hidden;
 }
