@@ -39,4 +39,6 @@ def disconnect():
 
 
 if __name__ == "__main__":
-    socketio.run(app, debug=True, host = "192.168.1.64", port=6070)
+    socketio.run(app, debug=True, host = "127.0.0.1")
+
+#6070

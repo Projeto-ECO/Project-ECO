@@ -1,2 +1,5 @@
-Date,Operation,Coin,Amount,Total,Account Balance
-26-04-2023 16:59:13,Deposit,1.00 �,1,1.00 �,1.00 �
+Data,Descrição,Montante,Saldo Contabilístico
+13-05-2023,Withdrawl,-2.00 €,0.00 €
+13-05-2023,Withdrawl,-0.01 €,2.00 €
+13-05-2023,Deposit,0.01 €,2.01 €
+13-05-2023,Deposit,2.00 €,2.00 €

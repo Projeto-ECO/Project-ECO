@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/statement.css') }}">
+        <title>Conversor Excel/CSV</title>
+    </head>
+    <body>
+        <h1>Conversor Excel/CSV</h1>
+        <form action="/statement/{{username}}" method="post" enctype="multipart/form-data">
+            <label for="file" id="file-label">Selecione um arquivo Excel ou CSV:</label><br>
+            <input type="file" name="file" id="file" accept=".csv, .xls, .xlsx" onchange="previewFile()"><br><br>
+            <img src="" id="file-icon">
+            <div id="preview"></div>
+            <br>
+            <input type="submit" value="Submeter">
+        </form>
+        <br>
+        <a href="/download_pdf/{{id}}">Baixar Extrato ECO</a>
+    </body>
+    <script type="text/javascript" src="{{url_for('static', filename='statement.js')}}"></script>
+</html>

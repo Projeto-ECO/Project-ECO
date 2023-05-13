@@ -3,10 +3,10 @@
         {
             "username": "Tiago",
             "password": "1656",
-            "email": "t.fonseca@ua.pt",
+            "email": "tiagofonseca2002@hotmail.com",
             "id": "363294",
-            "active": false,
-            "last_activity": "02-05-2023 20:31:21"
+            "active": true,
+            "last_activity": "13-05-2023 16:14:27"
         },
         {
             "username": "Tomas",
@@ -43,10 +43,10 @@
         {
             "username": "Eco",
             "password": "1656",
-            "email": "tiagofonseca2002@hotmail.com",
-            "id": "683056",
+            "email": "t.fonseca@ua.pt",
+            "id": "278018",
             "active": true,
-            "last_activity": "02-05-2023 20:07:51"
+            "last_activity": "07-05-2023 16:21:33"
         }
     ]
 }

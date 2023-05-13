@@ -15,6 +15,8 @@ from reportlab.lib.enums import TA_CENTER
 import shutil
 from string import ascii_uppercase
 import bleach
+import pandas as pd
+from converter import *
 
 
 def send_email(to, subject, body):
@@ -277,9 +279,9 @@ def activate_user(id):
 def check_statement_existence(id):
     directory = os.getcwd()
     if not os.path.exists(directory+f"\\accounts\\{id}\\{id}.csv"):
-        with open(directory+f"\\accounts\\{id}\\{id}.csv", "w+", newline="") as file:
+        with open(directory+f"\\accounts\\{id}\\{id}.csv", "w+", newline="", encoding="utf8") as file:
             csv_writer = csv.writer(file)
-            csv_writer.writerow(["Date", "Operation", "Coin", "Amount", "Total", "Account Balance"])
+            csv_writer.writerow(["Data", "Descrição", "Montante", "Saldo Contabilístico"])
     return True
 
 
@@ -296,14 +298,14 @@ def register_operation(id, operation, coin, amount):
                 total = -total
             else:
                 return False
-            statement_row = [datetime.now().strftime('%d-%m-%Y %H:%M:%S'), operation.title(), coin+" €", amount, "{:.2f}".format(total)+" €", "{:.2f}".format(accountBalance)+" €"]
-            with open(directory+f"\\accounts\\{id}\\{id}.csv", "a+", newline="", encoding="utf8") as file:
+            statement_row = [datetime.now().strftime('%d-%m-%Y'), operation.title(), "{:.2f}".format(total)+" €", "{:.2f}".format(accountBalance)+" €"]
+            with open(directory+f"\\accounts\\{id}\\{id}.csv", "r", newline="", encoding="utf8") as file:
                 csv_reader = csv.reader(file)
                 existing_rows = [row for row in csv_reader]
-                if statement_row not in existing_rows:
-                    csv_writer = csv.writer(file)
-                    csv_writer.writerow(statement_row)
-                return True
+            with open(directory+f"\\accounts\\{id}\\{id}.csv", "w", newline="", encoding="utf8") as file:
+                csv_writer = csv.writer(file)
+                csv_writer.writerows([existing_rows[0], statement_row] + existing_rows[1:])
+            return True
     except:
         return False
 
@@ -669,3 +671,86 @@ def create_user(username, password, email):
                 }
     create_user_folder(id)
     write_json("\\accounts\\"+id+"\\"+id+".json", json_coins)
+    return
+
+
+def store_statement(file, filename, ext, id):
+    # Salvar arquivo no disco
+    file_path = os.path.join(os.getcwd(), "accounts", id, "uploads", filename)
+    if not os.path.exists(os.path.join(os.getcwd(), "accounts", id, "uploads")):
+        os.makedirs(os.path.join(os.getcwd(), "accounts", id, "uploads"))
+    file.save(file_path)
+    # Ler arquivo Excel ou CSV
+    if ext == ".xlsx" or ext == ".xls":
+        convert_excel_to_csv(file_path)
+        os.remove(file_path)
+        file_path = os.path.splitext(file_path)[0] + ".csv"
+    clean_csv_file(file_path)
+    # Identificar banco
+    bank = get_statement_bank(file_path)
+    # Extrair dados
+    lst = get_statement_data(file_path)
+    if lst != []:
+        store_external_statement_data(lst, file_path, bank)
+
+
+def get_statement_bank(filepath):
+    with open(filepath, newline='') as csvfile:
+        reader = csv.reader(csvfile, delimiter=',')
+        for row in reader:
+            if "Consultar saldos e movimentos" in row[0]:
+                return "CGD"
+            elif "Listagem de Movimentos" in row[0]:
+                return "Santander"
+
+
+def get_statement_data(filepath):
+    lst = []
+    if not os.path.exists(filepath):
+        return lst
+    with open(filepath, "r", encoding="utf-8") as csvfile:
+        reader = csv.reader(csvfile, delimiter=';')
+        for row in reader:
+            lst.append(row)
+    return lst
+
+
+def store_external_statement_data(lst,filepath, bank):
+    with open(filepath, 'w+', newline='', encoding="utf-8") as csvfile:
+        writer = csv.writer(csvfile, delimiter=',')
+        if bank == "CGD":
+            writer.writerow(["Data", "Descrição", "Montante", "Saldo Contabilístico"])
+            lst = lst[7:-1]
+            for element in lst:
+                if element[3] == "":
+                    element[3] = "-" + element[4]
+                new_lst=[element[1], element[2], element[3], element[6]]
+                writer.writerow(new_lst)
+        elif bank == "Santander":
+            writer.writerow(["Data", "Descrição", "Montante", "Saldo Contabilístico"])
+            lst = lst[7:]
+            for element in lst:
+                element = element[1:]
+                writer.writerow(element)
+
+
+def clean_platform_csv(id):
+    if not os.path.exists(os.getcwd()+f"\\accounts\\{id}\\{id}.csv"):
+        return []
+    with open(os.getcwd()+f"\\accounts\\{id}\\{id}.csv", "r", encoding="utf8") as file:
+        reader = csv.reader(file)
+        lst = []
+        for row in reader:
+            lst.append([row[0], row[1], row[-2], row[-1]])
+    if lst != []:
+        lst.pop(0)
+    return lst
+
+
+def foreign_statement(bank, id):
+    with open(os.getcwd()+f"\\accounts\\{id}\\uploads\\{bank}.csv") as file:
+        reader = csv.reader(file)
+        lst = []
+        for row in reader:
+            lst.append(row)
+    return lst

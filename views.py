@@ -3,6 +3,8 @@ import time
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for, session, send_file
 from handlers import *
 from flask_socketio import send, leave_room, join_room
+from werkzeug.utils import secure_filename
+from converter import clean_csv_file, convert_excel_to_csv
 
 
 views = Blueprint(__name__, "views")
@@ -53,6 +55,7 @@ def go_to_home():
 @views.route("/two-factor-auth-login/<username>", methods=["GET", "POST"])
 def two_factor_auth_login(username):
     code = session.get("code")
+    print(code)
     data = read_json("\\db_handler\\users.json")
     for user in data["users"]:
         if user["username"] == username:
@@ -146,6 +149,7 @@ def signup():
             session["email_signup"] = email
             session["password_signup"] = password
             content = {"username": username, "email": email}
+            print(code)
             send_two_factor_auth_code(content, code, "signup")
             return redirect(url_for("views.two_factor_auth_signup"))
     else:
@@ -154,43 +158,68 @@ def signup():
 
 @views.route("/deposit/<name>", methods=["POST", "GET"])
 def deposit(name):
+    set_activity_timer(get_id_by_username(name))
     print("entrou")
     coin = request.form.get("coin-deposit")
     if "," in coin:
         coin = coin.replace(",", ".")
     amount = request.form.get("amount-deposit")
     banking_operations(get_id_by_username(name), "deposit", coin, amount)
-    set_activity_timer(get_id_by_username(name))
+    
     return redirect(url_for("views.profile", username=name))
 
 
 @views.route("/withdrawl/<name>", methods=["POST", "GET"])
 def withdrawl(name):
+    set_activity_timer(get_id_by_username(name))
     coin = request.form.get("coin-withdrawl")
     if "," in coin:
         coin = coin.replace(",", ".")
     amount = request.form.get("amount-withdrawl")
     banking_operations(get_id_by_username(name), "withdrawl", coin, amount)
-    set_activity_timer(get_id_by_username(name))
+    
     return redirect(url_for("views.profile", username=name))
 
 
 @views.route("/download_pdf/<id>")
 def download_pdf(id):
+    set_activity_timer(id)
     username = search_user_by_id(id)["username"]
     csv_to_pdf(os.getcwd()+f"\\accounts\\{id}\\{id}.csv", id)
     filename = os.getcwd()+f"\\accounts\\{id}\\{id}.pdf"
     response = send_file(filename, as_attachment=True)
     response.headers['Content-Disposition'] = f'attachment; filename=ECO_Statement_{username}.pdf'
-    set_activity_timer(id)
+    
     return response
+
+
+@views.route("/statement/<name>", methods=["POST", "GET"])
+def statement(name):
+    id = get_id_by_username(name)
+    set_activity_timer(id)
+    if request.method == "POST":
+        # Obter arquivo do formulário
+        file = request.files["file"]
+        # Obter nome do arquivo
+        filename = secure_filename(file.filename)
+        # Verificar se o arquivo é Excel ou CSV
+        ext = os.path.splitext(filename)[1].lower()
+        if ext == ".xlsx" or ext == ".csv" or ext == ".xls":
+            store_statement(file, filename, ext, id)
+            return "Arquivo processado com sucesso."
+        else:
+            return "Por favor, selecione um arquivo Excel ou CSV."
+    # Código GET aqui
+    return render_template("statement.html", username=name, id=get_id_by_username(name))
+
 
 
 @views.route("/account/<username>")
 def account(username):
+    set_activity_timer(get_id_by_username(username))
     if last_activity_check(get_id_by_username(username)) == False:
         return redirect(url_for("views.login"))
-    set_activity_timer(get_id_by_username(username))
+    
     return render_template("account.html", username=username, id=get_id_by_username(username))
 
 @views.route("/accounts/<id>/<image>", methods=["POST", "GET"])
@@ -205,6 +234,7 @@ def get_image(filename):
 
 @views.route("/update_account/<id>", methods=["POST"])
 def update_account(id):
+    set_activity_timer(id)
     if last_activity_check(id) == False:
         return redirect(url_for("views.login"))
     # create the file path
@@ -229,7 +259,7 @@ def update_account(id):
         email = search_user_by_id(id)["email"]
     if password != "":
         update_password(id, password)
-    set_activity_timer(id)
+    
     return redirect(url_for("views.profile", username=get_username_by_id(id)))
 
 

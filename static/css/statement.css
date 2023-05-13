@@ -1,0 +1,11 @@
+#file-label {
+    font-size: 1.2em;
+}
+#file-icon {
+    max-width: 50px;
+    max-height: 50px;
+}
+#preview {
+    margin-top: 10px;
+    font-size: 1.2em;
+}

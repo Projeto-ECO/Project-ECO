@@ -1,4 +1,2 @@
-code-DMKP join- create-False
-entrou-DMKP {'name': '683056', 'message': 'boAS'}
-entrou-DMKP {'name': '683056', 'message': 'oaslasdasdas'}
-entrou-DMKP {'name': '683056', 'message': 'aajsdbf;uajsbdfjkasdfssdfsdfsdfsfsdfsdfaajsdbf;uajsbdfjkasdfssdfsdfsdfsfsdfsdfaajsdbf;uajsbdfjkasdfssdfsdfsdfsfsdfsdfaajsdbf;uajsbdfjkasdfssdfsdfsdfsfsdfsdfaajsdbf;uajsbdfjkasdfssdfsdfsdfsfsdfsdfaajsdbf;uajsbdfjkasdfssdfsdfsdfsfsdfsdfaajsdbf;uajsbdfjkasdfssdfsdfsdfsfsdfsdfaajsdbf;uajsbdfjkasdfssdfsdfsdfsfsdfsdfaajsdbf;uajsbdfjkasdfssdfsdfsdfsfsdfsdfaajsdbf;uajsbdfjkasdfssdfsdfsdfsfsdfsdfaajsdbf;uajsbdfjkasdfssdfsdfsdfsfsdfsdfaajsdbf;uajsbdfjkasdfssdfsdfsdfsfsdfsdfaajsdbf;uajsbdfjkasdfssdfsdfsdfsfsdfsdf'}
+code- join-False create-
+entrou-YKUK {'name': '278018', 'message': 'Ola!'}10.020.00.00.010.00.00.00.01.03.00.00.00.125.125.17.19.115.117.125.128.136.10.02.02.012.0

@@ -1,3 +1,36 @@
 {
-    "rooms": []
+    "rooms": [
+        {
+            "code": "XXWJ",
+            "members": [
+                {
+                    "name": "Eco",
+                    "id": "683056"
+                }
+            ],
+            "messages": [
+                {
+                    "name": "Eco",
+                    "id": "683056",
+                    "message": "asfaf",
+                    "time": "04-05-2023 11:10",
+                    "image": "\\accounts\\683056\\683056.png"
+                },
+                {
+                    "name": "Eco",
+                    "id": "683056",
+                    "message": "ad",
+                    "time": "04-05-2023 11:10",
+                    "image": "\\accounts\\683056\\683056.png"
+                },
+                {
+                    "name": "Eco",
+                    "id": "683056",
+                    "message": "sd",
+                    "time": "04-05-2023 11:10",
+                    "image": "\\accounts\\683056\\683056.png"
+                }
+            ]
+        }
+    ]
 }
