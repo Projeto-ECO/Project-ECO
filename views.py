@@ -210,8 +210,25 @@ def statement(name):
         else:
             return "Por favor, selecione um arquivo Excel ou CSV."
     # Código GET aqui
-    return render_template("statement.html", username=name, id=get_id_by_username(name))
+    expenses, expenses_dic = get_expenses(id)
+    profits, profits_dic = get_profits(id)
+    dic = {"Despesas": Decimal(expenses.split("€")[0]).quantize(Decimal('0.01')), "Lucros": Decimal(profits.split("€")[0]).quantize(Decimal('0.01'))}
+    image_base64 = get_pizza_info(dic, id, "statement")
+    return render_template("statement.html", username=name, id=get_id_by_username(name), image_base64_profits_expenses=image_base64)
 
+
+@views.route('/expenses/<id>')
+def expenses(id):
+    expenses, expenses_dic = get_expenses(id)
+    image_base64 = get_pizza_info(expenses_dic, id, "expenses")
+    return render_template('expenses.html', expenses=expenses, expenses_dic=expenses_dic, image_base64=image_base64, id=id)
+
+
+@views.route('/profits/<id>')
+def profits(id):
+    profits, profits_dic = get_profits(id)
+    image_base64 = get_pizza_info(profits_dic, id, "profits")
+    return render_template('profits.html', profits=profits, profits_dic=profits_dic, image_base64_profits=image_base64, id=id)
 
 
 @views.route("/account/<username>")

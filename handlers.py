@@ -17,6 +17,11 @@ from string import ascii_uppercase
 import bleach
 import pandas as pd
 from converter import *
+from decimal import Decimal
+import matplotlib.pyplot as plt
+import base64
+import io
+import numpy as np
 
 
 def send_email(to, subject, body):
@@ -280,7 +285,7 @@ def check_statement_existence(id):
     directory = os.getcwd()
     if not os.path.exists(directory+f"\\accounts\\{id}\\{id}.csv"):
         with open(directory+f"\\accounts\\{id}\\{id}.csv", "w+", newline="", encoding="utf8") as file:
-            csv_writer = csv.writer(file)
+            csv_writer = csv.writer(file, delimiter=";")
             csv_writer.writerow(["Data", "Descrição", "Montante", "Saldo Contabilístico"])
     return True
 
@@ -300,10 +305,10 @@ def register_operation(id, operation, coin, amount):
                 return False
             statement_row = [datetime.now().strftime('%d-%m-%Y'), operation.title(), "{:.2f}".format(total)+" €", "{:.2f}".format(accountBalance)+" €"]
             with open(directory+f"\\accounts\\{id}\\{id}.csv", "r", newline="", encoding="utf8") as file:
-                csv_reader = csv.reader(file)
+                csv_reader = csv.reader(file, delimiter=";")
                 existing_rows = [row for row in csv_reader]
             with open(directory+f"\\accounts\\{id}\\{id}.csv", "w", newline="", encoding="utf8") as file:
-                csv_writer = csv.writer(file)
+                csv_writer = csv.writer(file, delimiter=";")
                 csv_writer.writerows([existing_rows[0], statement_row] + existing_rows[1:])
             return True
     except:
@@ -312,7 +317,7 @@ def register_operation(id, operation, coin, amount):
 
 def get_statement(id):
     with open(os.getcwd()+f"\\accounts\\{id}\\{id}.csv", "r") as file:
-        csv_reader = csv.reader(file)
+        csv_reader = csv.reader(file, delimiter=";")
         return list(csv_reader)
 
 
@@ -321,8 +326,6 @@ def get_account_balance(id):
     total = 0
     for coin_ in data["coins"]:
         total += float(data["coinAmounts"][coin_["name"]]) * float(coin_["value"])
-    with open("cenas.txt", "a+") as file:
-        file.write(str(total))
     return total
 
 
@@ -337,7 +340,7 @@ def csv_to_pdf(csv_path, id):
 
     # Read the CSV file and convert it to a list of rows
     with open(input_path, "r", encoding="utf8") as f:
-        rows = [row.strip().split(",") for row in f]
+        rows = [row.strip().split(";") for row in f]
 
     # Define the table style
     style = TableStyle([
@@ -722,8 +725,10 @@ def store_external_statement_data(lst,filepath, bank):
             writer.writerow(["Data", "Descrição", "Montante", "Saldo Contabilístico"])
             lst = lst[7:-1]
             for element in lst:
-                if element[3] == "":
-                    element[3] = "-" + element[4]
+                if element[3] != "":
+                    element[3] = "-" + element[3]
+                else:
+                    element[3] = element[4]
                 new_lst=[element[1], element[2], element[3], element[6]]
                 writer.writerow(new_lst)
         elif bank == "Santander":
@@ -754,3 +759,201 @@ def foreign_statement(bank, id):
         for row in reader:
             lst.append(row)
     return lst
+
+
+def calculate_bank_expenses(lst):
+    dic = {}
+    expenses = 0
+    for element in lst:
+        if element[2] != "" and float(element[2]) < 0:
+            expenses += round(float(element[2]) * -1, 2)
+            if element[1] not in dic:
+                dic[element[1]] = round(float(element[2]) * -1, 2)
+            else:
+                dic[element[1]] += round(float(element[2]) * -1, 2)
+    return round(expenses, 2), dic
+
+
+def calculate_bank_profits(lst):
+    dic = {}
+    profits = Decimal('0')
+    for element in lst:
+        if element[2] != "" and float(element[2]) > 0:
+            profit = Decimal(element[2]).quantize(Decimal('0.01'))
+            profits += profit
+            if element[1] not in dic:
+                dic[element[1]] = profit
+            else:
+                dic[element[1]] += profit
+    return round(profits, 2), dic
+
+
+
+def read_csv_statement_file(filepath):
+    lst = []
+    with open(filepath, "r", encoding="utf-8") as csvfile:
+        reader = csv.reader(csvfile, delimiter=',')
+        for row in reader:
+            lst.append(row)
+    return lst[1:]
+
+def get_expenses(id):
+    if check_bank_statement_exists("CGD", id):
+        cgd = read_csv_statement_file(os.getcwd()+f"\\accounts\\{id}\\uploads\\CGD.csv")
+    else:
+        cgd = []
+    if check_bank_statement_exists("Santander", id):
+        santander = read_csv_statement_file(os.getcwd()+f"\\accounts\\{id}\\uploads\\Santander.csv")
+    else:
+        santander = []
+    eco_statement = get_statement_data(os.getcwd()+f"\\accounts\\{id}\\{id}.csv")
+    for element in eco_statement:
+        element[-1] = element[-1].replace("€", "").strip()
+        element[-2] = element[-2].replace("€", "").strip()
+    eco_expenses, eco_dic_expenses = calculate_bank_expenses(eco_statement[1:])
+    expenses_cgd, expenses_dic_cgd = calculate_bank_expenses(cgd)
+    expenses_santander, expenses_dic_santander = calculate_bank_expenses(santander)
+    expenses = round(expenses_cgd + expenses_santander + eco_expenses, 2)
+    expenses_dic = expenses_dic_cgd | expenses_dic_santander | eco_dic_expenses # Merge dictionaries
+    expenses_dic = filter_operations(expenses_dic)
+    return str(expenses) + " €", expenses_dic
+
+
+def get_profits(id):
+    if check_bank_statement_exists("CGD", id):
+        cgd = read_csv_statement_file(os.getcwd()+f"\\accounts\\{id}\\uploads\\CGD.csv")
+    else:
+        cgd = []
+    if check_bank_statement_exists("Santander", id):
+        santander = read_csv_statement_file(os.getcwd()+f"\\accounts\\{id}\\uploads\\Santander.csv")
+    else:
+        santander = []
+    eco_statement = get_statement_data(os.getcwd()+f"\\accounts\\{id}\\{id}.csv")
+    for element in eco_statement:
+        element[-1] = element[-1].replace("€", "").strip()
+        element[-2] = element[-2].replace("€", "").strip()
+    eco_profits, eco_dic_profits = calculate_bank_profits(eco_statement[1:])
+    profits_cgd, profits_dic_cgd = calculate_bank_profits(cgd)
+    profits_santander, profits_dic_santander = calculate_bank_profits(santander)
+    profits = round(profits_cgd + profits_santander + eco_profits, 2)
+    profits_dic = profits_dic_cgd | profits_dic_santander | eco_dic_profits # Merge dictionaries
+    profits_dic = filter_operations(profits_dic)
+    return str(profits) + " €", profits_dic
+
+
+def check_bank_statement_exists(bank, id):
+    if os.path.exists(os.getcwd()+f"\\accounts\\{id}\\uploads\\{bank}.csv"):
+        return True
+    else:
+        return False
+
+
+def filter_operations(dic):
+    dic_operations = {
+        "Compras" : 0,
+        "Transferências" : 0,
+        "Levantamentos" : 0,
+        "Depósitos" : 0,
+        "Anulações" : 0,
+        "Comissões" : 0,
+        "Carregamentos" : 0,
+        "Impostos" : 0,
+        "Transportes" : 0,
+        "Telecomunicações" : 0,
+        "Outros" : 0
+    }
+
+    dic_options = {
+        "Compras" : ["COMPRA", "COMPRAS", "PAGAMENTO"],
+        "Transferências" : ["TRANSFERÊNCIA", "TRF"],
+        "Levantamentos" : ["LEVANTAMENTO", "WITHDRAWL"],
+        "Depósitos" : ["Deposit", "DEPOSITO", "DEPOSIT"],
+        "Anulações" : ["Anulação", "ANULAÇÃO"],
+        "Comissões" : ["Comissão", "COMISSÃO", "COMISSAO"],
+        "Carregamentos" : ["Carregamento", "CARREGAMENTO"],
+        "Impostos": ["IMPOSTO", "IMPOSTOS"],
+        "Transportes": ["TRANSPORTE", "TRANSPORTES", "UBER", "BOLT", "TAXI", "AVEIROBUS", "TRANSDEV", "CP", "COMBOIOS", "METRO", "METRO DO PORTO", "METRO DO PORTO, S.A."],
+        "Telecomunicações": ["VODAFONE", "NOS", "MEO", "NOWO", "NOWO - COMUNICAÇÕES, S.A.", "VODAFONE.PT"],
+    }
+    new_dic = {}
+    for element in dic:
+        valor = Decimal(dic[element]).quantize(Decimal('0.01'))
+        element = element.split(" ")[0]
+        upper_element = element.upper()
+        if upper_element in dic_options["Compras"]:
+            dic_operations["Compras"] += valor
+        elif upper_element in dic_options["Transferências"]:
+            dic_operations["Transferências"] += valor
+        elif upper_element in dic_options["Levantamentos"]:
+            dic_operations["Levantamentos"] += valor
+        elif upper_element in dic_options["Depósitos"]:
+            dic_operations["Depósitos"] += valor
+        elif upper_element in dic_options["Anulações"]:
+            dic_operations["Anulações"] += valor
+        elif upper_element in dic_options["Comissões"]:
+            dic_operations["Comissões"] += valor
+        elif upper_element in dic_options["Carregamentos"]:
+            dic_operations["Carregamentos"] += valor
+        elif upper_element in dic_options["Impostos"]:
+            dic_operations["Impostos"] += valor
+        elif upper_element in dic_options["Transportes"]:
+            dic_operations["Transportes"] += valor
+        elif upper_element in dic_options["Telecomunicações"]:
+            dic_operations["Telecomunicações"] += valor
+        else:
+            dic_operations["Outros"] += valor
+
+    for element in dic_operations:
+        if dic_operations[element] != 0:
+            new_dic[element] = dic_operations[element]
+    return new_dic
+
+
+def get_pizza_info(dic, id, page):
+    # Cria listas com as chaves e valores do dicionário
+    keys = list(dic.keys())
+    values = list(dic.values())
+    values = [float(Decimal(str(value))) for value in values]
+
+    # Define o limite mínimo para o tamanho da fatia
+    min_size = 1
+
+    # Remove valores menores que o limite mínimo
+    values, keys = zip(*filter(lambda x: 100 * x[0] / sum(values) >= min_size, zip(values, keys)))
+
+    # Cria um gráfico de pizza com as informações do dicionário
+    fig, ax = plt.subplots()
+    wedges, _, autotexts = ax.pie(values, autopct='%1.1f%%', textprops={'color': 'black'})
+
+    # Adiciona texto com os nomes das fatias
+    total = sum(values)
+    for i, val in enumerate(values):
+        angle = 2 * np.pi * (sum(values[:i]) + val / 2) / sum(values)
+        x, y = np.cos(angle), np.sin(angle)
+        text = '{}'.format(keys[i])
+        # Adiciona o nome da fatia com uma linha apontando para ela
+        ax.annotate(text, xy=(x, y), xytext=(x*1.34, y*1.34), fontsize=10,
+                    ha='center', va='center', arrowprops=dict(arrowstyle='-', color=(77/255, 155/255, 75/255)))
+        # Reduz o tamanho da fonte das percentagens da fatia
+        autotexts[i].set_fontsize(8)
+    
+    # Define a cor da linha e do texto
+    for w in wedges:
+        w.set_edgecolor("none")
+    for t in ax.texts:
+        if t not in autotexts:
+            t.set_color("white")
+    
+    plt.axis('equal')
+
+    # Cria o diretório se ele não existir
+    dir_path = os.path.join(os.getcwd(), f"accounts/{id}/analysis")
+    os.makedirs(dir_path, exist_ok=True)
+
+    # Salva a figura no diretório
+    filename = f"{page}.png"
+    filepath = os.path.join(dir_path, filename)
+    plt.savefig(filepath, format='png', transparent=True)
+    # Limpa o plot para liberar memória
+    plt.clf()
+    return filepath
