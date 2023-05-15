@@ -872,6 +872,8 @@ def filter_operations(dic):
         "Alimentação" : 0,
         "Pagamentos" : 0,
         "Tecnologia" : 0,
+        "Cultura" : 0,
+        "Combustíveis" : 0,
         "Outros" : 0
     }
 
@@ -889,12 +891,14 @@ def filter_operations(dic):
         "Viagens" : ["EASYJET"],
         "Hotelaria" : ["HOTEL", "HOTELARIA"],
         "Ordenados" : ["Ordenado", "ORDENADO", "SALÁRIO", "SALARIO"],
-        "Restauração" : ["RESTAURANTE", "RESTAURAÇÃO", "RESTAURACAO", "RESTAURACAO", "MALANDRINHO", "LEITARIA", "GELATARIA", "GELADOS", "GELADO"],
+        "Restauração" : ["ARAUJO","ARAUJO VIDE","RESTAURANTE", "RESTAURAÇÃO", "RESTAURACAO", "RESTAURACAO", "MALANDRINHO", "LEITARIA", "GELATARIA", "GELADOS", "GELADO"],
         "Saúde" : ["WELL'S","WELLS", "FARMACIA", "CELEIRO", "FARMÁCIA", "FARMACIAS", "FARMÁCIAS"],
         "Moda" : ["SPRING","SPRING.8.AV.S.J.MAD.","HM", "ZARA", "BERSHKA", "PULL&BEAR", "STRADIVARIUS", "ZARA HOME", "ZARA.COM", "BERSHKA.COM", "PULLANDBEAR.COM", "STRADIVARIUS.COM", "ZARA HOME.COM", "ZARA.COM", "INTIMISSIMI"],
         "Estacionamento" : ["ESTACIONAMENTO", "PARQUIMETRO", "PARQUÍMETRO", "PARQUIMETROS", "PARQUÍMETROS", "EMEL", "PARQUE"],
-        "Alimentação" : ["CONTINENTE", "MINIPREÇO", "LIDL", "ALDI", "PÃO DE AÇÚCAR", "PÃO DE ACUCAR", "PÃO DE AÇUCAR", "PÃO DE ACÚCAR", "PINGO DOCE" , "PINGO", "PAO"],
-        "Tecnologia" : ["PCDIGA", "FNAC", "WORTEN", "RÁDIO", "RADIO", "SAMSUNG", "RÁDIO POPULAR", "APPLE"]
+        "Alimentação" : ["ASSICANTI","CONTINENTE", "MINIPREÇO", "LIDL", "ALDI", "PÃO DE AÇÚCAR", "PÃO DE ACUCAR", "PÃO DE AÇUCAR", "PÃO DE ACÚCAR", "PINGO DOCE" , "PINGO", "PAO"],
+        "Tecnologia" : ["PCDIGA", "FNAC", "WORTEN", "RÁDIO", "RADIO", "SAMSUNG", "RÁDIO POPULAR", "APPLE"],
+        "Cultura" : ["BOL"],
+        "Combustíveis" : ["GALP", "REPSOL", "BP", "CEPSA", "GALP ENERGIA", "REPSOL PORTUGAL", "BP PORTUGAL", "CEPSA PORTUGAL", "CPCP", "CPCP - COMBUSTÍVEIS, S.A."],
     }
     new_dic = {}
     for element in dic:
@@ -939,10 +943,12 @@ def filter_operations(dic):
             dic_operations["Estacionamento"] += valor
         elif upper_element_1 in dic_options["Alimentação"] or upper_element_join in dic_options["Alimentação"]:
             dic_operations["Alimentação"] += valor
-        elif upper_element_1 in dic_options["Pagamentos"] or upper_element_join in dic_options["Pagamentos"]:
-            dic_operations["Pagamentos"] += valor
         elif upper_element_1 in dic_options["Tecnologia"] or upper_element_join in dic_options["Tecnologia"]:
             dic_operations["Tecnologia"] += valor
+        elif upper_element_1 in dic_options["Cultura"] or upper_element_join in dic_options["Cultura"]:
+            dic_operations["Cultura"] += valor
+        elif upper_element_1 in dic_options["Combustíveis"] or upper_element_join in dic_options["Combustíveis"]:
+            dic_operations["Combustíveis"] += valor
         else:
             print(upper_element_1, upper_element_join)
             dic_operations["Outros"] += valor

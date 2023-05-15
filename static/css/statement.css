@@ -15,7 +15,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 12%;
+    margin-top: 7%;
+    margin-bottom: 7%;
 }
 
 .header-wrapper {
