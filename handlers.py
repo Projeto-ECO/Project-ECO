@@ -693,8 +693,10 @@ def store_statement(file, filename, ext, id):
     bank = get_statement_bank(file_path)
     # Extrair dados
     lst = get_statement_data(file_path)
+    file_path_bank = os.path.join(os.getcwd(), "accounts", id, "uploads", bank + ".csv")
     if lst != []:
-        store_external_statement_data(lst, file_path, bank)
+        store_external_statement_data(lst, file_path_bank, bank)
+    os.remove(file_path)
 
 
 def get_statement_bank(filepath):
@@ -860,11 +862,21 @@ def filter_operations(dic):
         "Impostos" : 0,
         "Transportes" : 0,
         "Telecomunicações" : 0,
+        "Viagens" : 0,
+        "Hotelaria" : 0,
+        "Ordenados" : 0,
+        "Restauração" : 0,
+        "Saúde" : 0,
+        "Moda" : 0,
+        "Estacionamento" : 0,
+        "Alimentação" : 0,
+        "Pagamentos" : 0,
+        "Tecnologia" : 0,
         "Outros" : 0
     }
 
     dic_options = {
-        "Compras" : ["COMPRA", "COMPRAS", "PAGAMENTO"],
+        "Compras" : ["COMPRA", "COMPRAS", "AMZN", "PAGAMENTO", "PAGAMENTOS"],
         "Transferências" : ["TRANSFERÊNCIA", "TRF"],
         "Levantamentos" : ["LEVANTAMENTO", "WITHDRAWL"],
         "Depósitos" : ["Deposit", "DEPOSITO", "DEPOSIT"],
@@ -872,40 +884,73 @@ def filter_operations(dic):
         "Comissões" : ["Comissão", "COMISSÃO", "COMISSAO"],
         "Carregamentos" : ["Carregamento", "CARREGAMENTO"],
         "Impostos": ["IMPOSTO", "IMPOSTOS"],
-        "Transportes": ["TRANSPORTE", "TRANSPORTES", "UBER", "BOLT", "TAXI", "AVEIROBUS", "TRANSDEV", "CP", "COMBOIOS", "METRO", "METRO DO PORTO", "METRO DO PORTO, S.A."],
+        "Transportes": ["TIP", "TRANSPORTE", "TRANSPORTES", "UBER", "BOLT", "TAXI", "AVEIROBUS", "TRANSDEV", "CP", "COMBOIOS", "METRO", "METRO DO PORTO", "METRO DO PORTO, S.A."],
         "Telecomunicações": ["VODAFONE", "NOS", "MEO", "NOWO", "NOWO - COMUNICAÇÕES, S.A.", "VODAFONE.PT"],
+        "Viagens" : ["EASYJET"],
+        "Hotelaria" : ["HOTEL", "HOTELARIA"],
+        "Ordenados" : ["Ordenado", "ORDENADO", "SALÁRIO", "SALARIO"],
+        "Restauração" : ["RESTAURANTE", "RESTAURAÇÃO", "RESTAURACAO", "RESTAURACAO", "MALANDRINHO", "LEITARIA", "GELATARIA", "GELADOS", "GELADO"],
+        "Saúde" : ["WELL'S","WELLS", "FARMACIA", "CELEIRO", "FARMÁCIA", "FARMACIAS", "FARMÁCIAS"],
+        "Moda" : ["SPRING","SPRING.8.AV.S.J.MAD.","HM", "ZARA", "BERSHKA", "PULL&BEAR", "STRADIVARIUS", "ZARA HOME", "ZARA.COM", "BERSHKA.COM", "PULLANDBEAR.COM", "STRADIVARIUS.COM", "ZARA HOME.COM", "ZARA.COM", "INTIMISSIMI"],
+        "Estacionamento" : ["ESTACIONAMENTO", "PARQUIMETRO", "PARQUÍMETRO", "PARQUIMETROS", "PARQUÍMETROS", "EMEL", "PARQUE"],
+        "Alimentação" : ["CONTINENTE", "MINIPREÇO", "LIDL", "ALDI", "PÃO DE AÇÚCAR", "PÃO DE ACUCAR", "PÃO DE AÇUCAR", "PÃO DE ACÚCAR", "PINGO DOCE" , "PINGO", "PAO"],
+        "Tecnologia" : ["PCDIGA", "FNAC", "WORTEN", "RÁDIO", "RADIO", "SAMSUNG", "RÁDIO POPULAR", "APPLE"]
     }
     new_dic = {}
     for element in dic:
         valor = Decimal(dic[element]).quantize(Decimal('0.01'))
-        element = element.split(" ")[0]
-        upper_element = element.upper()
-        if upper_element in dic_options["Compras"]:
+        element = element.split(" ")[:2]
+        upper_element_1 = element[0].upper()
+        element = " ".join(element)
+        upper_element_join = element.upper()
+        if upper_element_1 in dic_options["Compras"] or upper_element_join in dic_options["Compras"]:
             dic_operations["Compras"] += valor
-        elif upper_element in dic_options["Transferências"]:
+        elif upper_element_1 in dic_options["Transferências"] or upper_element_join in dic_options["Transferências"]:
             dic_operations["Transferências"] += valor
-        elif upper_element in dic_options["Levantamentos"]:
+        elif upper_element_1 in dic_options["Levantamentos"] or upper_element_join in dic_options["Levantamentos"]:
             dic_operations["Levantamentos"] += valor
-        elif upper_element in dic_options["Depósitos"]:
+        elif upper_element_1 in dic_options["Depósitos"] or upper_element_join in dic_options["Depósitos"]:
             dic_operations["Depósitos"] += valor
-        elif upper_element in dic_options["Anulações"]:
+        elif upper_element_1 in dic_options["Anulações"] or upper_element_join in dic_options["Anulações"]:
             dic_operations["Anulações"] += valor
-        elif upper_element in dic_options["Comissões"]:
+        elif upper_element_1 in dic_options["Comissões"] or upper_element_join in dic_options["Comissões"]:
             dic_operations["Comissões"] += valor
-        elif upper_element in dic_options["Carregamentos"]:
+        elif upper_element_1 in dic_options["Carregamentos"] or upper_element_join in dic_options["Carregamentos"]:
             dic_operations["Carregamentos"] += valor
-        elif upper_element in dic_options["Impostos"]:
+        elif upper_element_1 in dic_options["Impostos"] or upper_element_join in dic_options["Impostos"]:
             dic_operations["Impostos"] += valor
-        elif upper_element in dic_options["Transportes"]:
+        elif upper_element_1 in dic_options["Transportes"] or upper_element_join in dic_options["Transportes"]:
             dic_operations["Transportes"] += valor
-        elif upper_element in dic_options["Telecomunicações"]:
+        elif upper_element_1 in dic_options["Telecomunicações"] or upper_element_join in dic_options["Telecomunicações"]:
             dic_operations["Telecomunicações"] += valor
+        elif upper_element_1 in dic_options["Viagens"] or upper_element_join in dic_options["Viagens"]:
+            dic_operations["Viagens"] += valor
+        elif upper_element_1 in dic_options["Hotelaria"] or upper_element_join in dic_options["Hotelaria"]:
+            dic_operations["Hotelaria"] += valor
+        elif upper_element_1 in dic_options["Ordenados"] or upper_element_join in dic_options["Ordenados"]:
+            dic_operations["Ordenados"] += valor
+        elif upper_element_1 in dic_options["Restauração"] or upper_element_join in dic_options["Restauração"]:
+            dic_operations["Restauração"] += valor
+        elif upper_element_1 in dic_options["Saúde"] or upper_element_join in dic_options["Saúde"]:
+            dic_operations["Saúde"] += valor
+        elif upper_element_1 in dic_options["Moda"] or upper_element_join in dic_options["Moda"]:
+            dic_operations["Moda"] += valor
+        elif upper_element_1 in dic_options["Estacionamento"] or upper_element_join in dic_options["Estacionamento"]:
+            dic_operations["Estacionamento"] += valor
+        elif upper_element_1 in dic_options["Alimentação"] or upper_element_join in dic_options["Alimentação"]:
+            dic_operations["Alimentação"] += valor
+        elif upper_element_1 in dic_options["Pagamentos"] or upper_element_join in dic_options["Pagamentos"]:
+            dic_operations["Pagamentos"] += valor
+        elif upper_element_1 in dic_options["Tecnologia"] or upper_element_join in dic_options["Tecnologia"]:
+            dic_operations["Tecnologia"] += valor
         else:
+            print(upper_element_1, upper_element_join)
             dic_operations["Outros"] += valor
 
     for element in dic_operations:
         if dic_operations[element] != 0:
             new_dic[element] = dic_operations[element]
+    print(new_dic)
     return new_dic
 
 
@@ -919,14 +964,17 @@ def get_pizza_info(dic, id, page):
     min_size = 1
 
     # Remove valores menores que o limite mínimo
-    values, keys = zip(*filter(lambda x: 100 * x[0] / sum(values) >= min_size, zip(values, keys)))
+    if sum(values) != 0:
+        values, keys = zip(*filter(lambda x: 100 * x[0] / sum(values) >= min_size, zip(values, keys)))
+    else:
+        values = [1]
+        keys = ["Sem dados"]
 
     # Cria um gráfico de pizza com as informações do dicionário
     fig, ax = plt.subplots()
     wedges, _, autotexts = ax.pie(values, autopct='%1.1f%%', textprops={'color': 'black'})
 
     # Adiciona texto com os nomes das fatias
-    total = sum(values)
     for i, val in enumerate(values):
         angle = 2 * np.pi * (sum(values[:i]) + val / 2) / sum(values)
         x, y = np.cos(angle), np.sin(angle)
