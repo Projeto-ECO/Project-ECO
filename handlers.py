@@ -18,10 +18,21 @@ import bleach
 import pandas as pd
 from converter import *
 from decimal import Decimal
+from reportlab.lib.styles import getSampleStyleSheet
 import matplotlib.pyplot as plt
 import base64
 import io
 import numpy as np
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+from reportlab.lib.units import inch
+from reportlab.platypus import SimpleDocTemplate, Spacer, Image, Table, TableStyle
+from datetime import datetime
+from reportlab.lib.colors import Color
+import os
+from reportlab.platypus import PageBreak
+
 
 
 def send_email(to, subject, body):
@@ -36,6 +47,7 @@ def send_email(to, subject, body):
     return True
 
 def send_two_factor_auth_code(to, code, op):
+    print("Sending two factor auth code to: ", to)
     if op == "login":
         email = search_user_by_username(to)["email"]
     else:
@@ -696,7 +708,10 @@ def store_statement(file, filename, ext, id):
     file_path_bank = os.path.join(os.getcwd(), "accounts", id, "uploads", bank + ".csv")
     if lst != []:
         store_external_statement_data(lst, file_path_bank, bank)
-    os.remove(file_path)
+    if os.path.splitext(file_path)[0] != os.path.splitext(file_path_bank)[0]:
+        file_path = os.path.splitext(file_path)[0] + ".csv"
+        # Remover arquivo
+        os.remove(file_path)
 
 
 def get_statement_bank(filepath):
@@ -721,6 +736,8 @@ def get_statement_data(filepath):
 
 
 def store_external_statement_data(lst,filepath, bank):
+    if os.path.exists(filepath):
+        os.remove(filepath)
     with open(filepath, 'w+', newline='', encoding="utf-8") as csvfile:
         writer = csv.writer(csvfile, delimiter=',')
         if bank == "CGD":
@@ -818,6 +835,7 @@ def get_expenses(id):
     expenses = round(expenses_cgd + expenses_santander + eco_expenses, 2)
     expenses_dic = expenses_dic_cgd | expenses_dic_santander | eco_dic_expenses # Merge dictionaries
     expenses_dic = filter_operations(expenses_dic)
+    expenses_dic = dict(sorted(expenses_dic.items(), key=lambda x: x[1], reverse=True))
     return str(expenses) + " €", expenses_dic
 
 
@@ -840,6 +858,7 @@ def get_profits(id):
     profits = round(profits_cgd + profits_santander + eco_profits, 2)
     profits_dic = profits_dic_cgd | profits_dic_santander | eco_dic_profits # Merge dictionaries
     profits_dic = filter_operations(profits_dic)
+    profits_dic = dict(sorted(profits_dic.items(), key=lambda x: x[1], reverse=True))
     return str(profits) + " €", profits_dic
 
 
@@ -950,13 +969,11 @@ def filter_operations(dic):
         elif upper_element_1 in dic_options["Combustíveis"] or upper_element_join in dic_options["Combustíveis"]:
             dic_operations["Combustíveis"] += valor
         else:
-            print(upper_element_1, upper_element_join)
             dic_operations["Outros"] += valor
 
     for element in dic_operations:
         if dic_operations[element] != 0:
             new_dic[element] = dic_operations[element]
-    print(new_dic)
     return new_dic
 
 
@@ -1011,3 +1028,187 @@ def get_pizza_info(dic, id, page):
     # Limpa o plot para liberar memória
     plt.clf()
     return filepath
+
+
+
+def generate_economic_report(output_path, image_paths, id, dic_profits_expenses, expenses_dic, profits_dic):
+
+    image_paths = image_paths[::-1]
+
+    for element in dic_profits_expenses:
+        dic_profits_expenses[element] = str(dic_profits_expenses[element]) + " €"
+    
+    for element in expenses_dic:
+        expenses_dic[element] = str(expenses_dic[element]) + " €"
+    
+    for element in profits_dic:
+        profits_dic[element] = str(profits_dic[element]) + " €"
+
+    # Create the PDF document and add the table to it
+
+    # Definir as margens da página
+    left_margin = 0.2 * inch  # Margem esquerda em polegadas
+    right_margin = 0.2 * inch  # Margem direita em polegadas
+    top_margin = 0.2 * inch  # Margem superior em polegadas
+    bottom_margin = 0.2 * inch  # Margem inferior em polegadas
+
+    # Criar o objeto SimpleDocTemplate com as margens personalizadas
+    doc = SimpleDocTemplate(
+        output_path,
+        pagesize=letter,
+        leftMargin=left_margin,
+        rightMargin=right_margin,
+        topMargin=top_margin,
+        bottomMargin=bottom_margin,
+        encoding="utf-8"
+    )
+
+
+    # Create the username and ID paragraph
+    username_style = ParagraphStyle(
+        name='UsernameStyle',
+        fontName='Helvetica',
+        fontSize=12,
+        textColor=colors.black,
+        leading=inch * 2,  # Espaçamento entre linhas
+        alignment=1  # Valor 1 para centralizar o texto
+    )
+
+    datetime_style = ParagraphStyle(
+        name='DateTimeStyle',
+        fontName='Helvetica',
+        fontSize=11,
+        textColor=colors.black,
+        alignment=1  # Valor 1 para centralizar o texto
+    )
+
+    # Add the username/ID paragraph to the PDF document
+    username = search_user_by_id(id)["username"]
+    username_text = f"{username} ({id})"
+    username_para = Paragraph(username_text, username_style)
+
+    elements = []
+
+    # PRIMEIRA PÁGINA
+
+    # Calculate the vertical position for centering horizontally
+    cover_text_height = username_para.wrapOn(doc, doc.width, doc.height)[1]
+    vertical_position = (doc.height - cover_text_height) / 2
+
+    # Add vertical spacing to position the text in the center
+    elements.append(Spacer(width=0, height=vertical_position))
+
+    # Create the logo image object
+    logo_path = os.getcwd() + "\\static\\images\\Eco.png"
+    logo = Image(logo_path, width=1.5*inch, height=1*inch)
+
+    elements.append(logo)
+    elements.append(Spacer(width=0, height=2.5*inch))
+    elements.append(username_para)
+
+    # Create the date and time paragraph
+    now = datetime.now()
+    datetime_text = f"{now.strftime('%d-%m-%Y')}"
+    datetime_para = Paragraph(datetime_text, datetime_style)
+    elements.append(datetime_para)
+
+    # PAGINAS SEGINTES
+    dic_names = {"Expenses": "Despesas", "Profits": "Receitas", "Statement": "Geral"}
+    # Create the logo image objects with colored background
+    for path in image_paths:
+        name = os.path.splitext(os.path.basename(path))[0].title()
+
+        # Create the image and apply the colored background to the table cell
+        image = Image(path, width=6.5*inch, height=5*inch)
+        image_data = [[image]]
+
+        # Define a colored background for the image cell
+        bg_color = Color(52/255, 53/255, 65/255, alpha=1)
+        image_style = TableStyle([
+            ('BACKGROUND', (0, 0), (-1, -1), bg_color),
+        ])
+        image_table = Table(image_data, style=image_style)
+
+        elements.append(PageBreak())
+        # Add custom cover page
+
+        # Add text to cover page
+        cover_text = dic_names[name]
+        cover_text_style = ParagraphStyle(
+            name='CoverTextStyle',
+            fontName='Helvetica',
+            fontSize=24,
+            textColor=colors.black,
+            leading=inch * 2,  # Espaçamento entre linhas
+            alignment=1  # Centralizar horizontalmente
+        )
+        cover_text_para = Paragraph(cover_text, cover_text_style)
+
+        # Calculate the vertical position for centering horizontally
+        cover_text_height = cover_text_para.wrapOn(doc, doc.width, doc.height)[1]
+        vertical_position = (doc.height - cover_text_height) / 2
+
+        # Add vertical spacing to position the text in the center
+        elements.append(Spacer(width=0, height=vertical_position))
+        elements.append(cover_text_para)
+        elements.append(PageBreak())
+
+        if name == "Statement":
+            # Create the table for the first dictionary data
+            elements.append(Spacer(width=0, height=1*inch))
+            table_data1 = [[str(key), str(value)] for key, value in dic_profits_expenses.items()]
+            table1 = Table(table_data1, colWidths=[200, 200])
+            table1.setStyle(TableStyle([
+                ('GRID', (0, 0), (-1, -1), 1, colors.black),
+                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                ('BACKGROUND', (0, 0), (0, -1), (77/255, 155/255, 75/255)),  # Define a coluna da esquerda com uma cor de fundo
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),  # Centraliza os dados e o cabeçalho
+                ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),  # Define a fonte do cabeçalho
+                ('FONTSIZE', (0, 0), (0, -1), 12),  # Define o tamanho da fonte do cabeçalho
+            ]))
+            elements.append(Spacer(width=0, height=vertical_position-250))
+            elements.append(table1)
+            #elements.append(PageBreak())
+        elif name == "Expenses":
+            # Create the table for the second dictionary data
+            elements.append(Spacer(width=0, height=1*inch))
+            table_data2 = [["Despesa", "Montante"]] + [[str(key), str(value)] for key, value in expenses_dic.items()]
+            table2 = Table(table_data2, colWidths=[200, 200])
+            table2.setStyle(TableStyle([
+                ('GRID', (0, 0), (-1, -1), 1, colors.black),
+                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                ('BACKGROUND', (0, 0), (-1, 0), (77/255, 155/255, 75/255)),  # Define o cabeçalho com uma cor de fundo
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),  # Centraliza os dados e o cabeçalho
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),  # Define a fonte do cabeçalho
+                ('FONTSIZE', (0, 0), (-1, 0), 12),  # Define o tamanho da fonte do cabeçalho
+            ]))
+            elements.append(Spacer(width=0, height=vertical_position-200))
+            elements.append(table2)
+            elements.append(Spacer(width=0, height=0.1*inch))
+            elements.append(PageBreak())
+        elif name == "Profits":
+            # Create the table for the third dictionary data
+            elements.append(Spacer(width=0, height=1*inch))
+            table_data3 = [["Receita", "Montante"]] + [[str(key), str(value)] for key, value in profits_dic.items()]
+            table3 = Table(table_data3, colWidths=[200, 200])
+            table3.setStyle(TableStyle([
+                ('GRID', (0, 0), (-1, -1), 1, colors.black),
+                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                ('BACKGROUND', (0, 0), (-1, 0), (77/255, 155/255, 75/255)),  # Define o cabeçalho com uma cor de fundo
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),  # Centraliza os dados e o cabeçalho
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),  # Define a fonte do cabeçalho
+                ('FONTSIZE', (0, 0), (-1, 0), 12),  # Define o tamanho da fonte do cabeçalho
+            ]))
+            elements.append(Spacer(width=0, height=vertical_position-200))
+            elements.append(table3)
+            elements.append(Spacer(width=0, height=0.1*inch))
+            elements.append(PageBreak())
+
+        if path != image_paths[0]:
+            # Add vertical spacing to position the image in the center
+            elements.append(Spacer(width=0, height=vertical_position-150))
+        elements.append(Spacer(width=0, height=0.3*inch))
+        elements.append(image_table)
+
+    doc.build(elements)
+    return True
