@@ -1,14 +1,6 @@
 {
     "users": [
         {
-            "username": "Tiago",
-            "password": "1656",
-            "email": "tiagofonseca2002@hotmail.com",
-            "id": "363294",
-            "active": true,
-            "last_activity": "14-05-2023 18:32:50"
-        },
-        {
             "username": "Tomas",
             "password": "1647",
             "email": "tomasfonseca14@ua.pt",
@@ -21,7 +13,7 @@
             "password": "1234",
             "email": "pockettomas2002@gmail.com",
             "id": "838951",
-            "active": true,
+            "active": false,
             "last_activity": "16-05-2023 11:55:08"
         },
         {
@@ -37,7 +29,7 @@
             "password": "123456",
             "email": "hmxr@ua.pt",
             "id": "221399",
-            "active": true,
+            "active": false,
             "last_activity": "02-05-2023 16:04:45"
         },
         {
@@ -45,8 +37,24 @@
             "password": "1656",
             "email": "t.fonseca@ua.pt",
             "id": "278018",
-            "active": true,
-            "last_activity": "07-05-2023 16:21:33"
+            "active": false,
+            "last_activity": "17-05-2023 22:04:32"
+        },
+        {
+            "username": "Tiago",
+            "password": "1656",
+            "email": "tiagofonseca2002@hotmail.com",
+            "id": "696582",
+            "active": false,
+            "last_activity": "17-05-2023 22:06:01"
+        },
+        {
+            "username": "lucasmatos7",
+            "password": "12345678",
+            "email": "luklukitas8@gmail.com",
+            "id": "324244",
+            "active": false,
+            "last_activity": "16-05-2023 19:17:43"
         }
     ]
 }

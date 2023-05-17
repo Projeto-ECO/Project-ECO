@@ -108,15 +108,18 @@ def login():
     else:
         return render_template("login.html")
 
-@views.route("/logout", methods=["POST"])
-def logout():
-    print(session.get("id"))
-    print(session.get("username"))
-    if inactivate_user( session.get("id")):
-        session.clear()
-        return redirect(url_for("views.index"))
+
+@views.route("/logout/<name>", methods=["POST", "GET"])
+def logout(name):
+    id = get_id_by_username(name)
+    if last_activity_check(id):
+        if inactivate_user(id):
+            session.clear()
+            return redirect(url_for("views.index"))
+        else:
+            return redirect(url_for("views.profile", username=name))
     else:
-        return redirect(url_for("views.profile", username=session.get("username")))
+        return redirect(url_for("views.index"))
 
 
 @views.route("/recover-password", methods=["GET", "POST"])
