@@ -33,20 +33,12 @@
             "last_activity": "02-05-2023 16:04:45"
         },
         {
-            "username": "Eco",
-            "password": "1656",
-            "email": "t.fonseca@ua.pt",
-            "id": "278018",
-            "active": false,
-            "last_activity": "17-05-2023 22:04:32"
-        },
-        {
             "username": "Tiago",
             "password": "1656",
             "email": "tiagofonseca2002@hotmail.com",
             "id": "696582",
-            "active": false,
-            "last_activity": "17-05-2023 22:06:01"
+            "active": true,
+            "last_activity": "18-05-2023 09:10:51"
         },
         {
             "username": "lucasmatos7",
@@ -55,6 +47,22 @@
             "id": "324244",
             "active": false,
             "last_activity": "16-05-2023 19:17:43"
+        },
+        {
+            "username": "Laranjo",
+            "password": "euetu2003",
+            "email": "tomas.laranjo@ua.pt",
+            "id": "811278",
+            "active": true,
+            "last_activity": "18-05-2023 09:11:04"
+        },
+        {
+            "username": "torres",
+            "password": "1234",
+            "email": "pedromtorres@ua.pt",
+            "id": "762695",
+            "active": true,
+            "last_activity": "18-05-2023 09:25:04"
         }
     ]
 }
