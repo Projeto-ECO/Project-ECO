@@ -20,11 +20,9 @@ def index():
 def profile(username):
     if not username:
         username = request.referrer.split("/")[-1]
-        print("USERNAME------------------------ "+ username)
     activity_status = check_if_online(username)
     if activity_status == True:
         id=get_id_by_username(username)
-        print("ID----------->"+id)
         if id is None:
             return redirect(url_for("views.index"))
         elif last_activity_check(id):
@@ -38,14 +36,12 @@ def profile(username):
         return redirect(url_for("views.index"))
 
 
-@views.route("database/users.json")
-def get_users():
-    return jsonify(read_json("\\database\\users.json"))
-
-
 @views.route("/data/<id>")
 def get_data(id):
-    return jsonify(read_json("/database/accounts/"+id+"\\"+id+".json"))
+    if last_activity_check(id):
+        return jsonify(read_json("/database/accounts/"+id+"\\"+id+".json"))
+    else:
+        return redirect(url_for("views.index"))
 
 
 @views.route("/go-to-home")
@@ -56,7 +52,6 @@ def go_to_home():
 @views.route("/two-factor-auth-login/<username>", methods=["GET", "POST"])
 def two_factor_auth_login(username):
     code = session.get("code")
-    print(code)
     data = read_json("\\database\\users.json")
     for user in data["users"]:
         if user["username"] == username:
@@ -164,105 +159,125 @@ def signup():
 
 @views.route("/deposit/<name>", methods=["POST", "GET"])
 def deposit(name):
-    set_activity_timer(get_id_by_username(name))
-    print("entrou")
-    coin = request.form.get("coin-deposit")
-    if "," in coin:
-        coin = coin.replace(",", ".")
-    amount = request.form.get("amount-deposit")
-    banking_operations(get_id_by_username(name), "deposit", coin, amount)
-    
-    return redirect(url_for("views.profile", username=name))
+    if last_activity_check(get_id_by_username(name)) is False:
+        return redirect(url_for("views.index"))
+    else:
+        coin = request.form.get("coin-deposit")
+        if "," in coin:
+            coin = coin.replace(",", ".")
+        amount = request.form.get("amount-deposit")
+        banking_operations(get_id_by_username(name), "deposit", coin, amount)
+        
+        return redirect(url_for("views.profile", username=name))
 
 
 @views.route("/withdrawl/<name>", methods=["POST", "GET"])
 def withdrawl(name):
-    set_activity_timer(get_id_by_username(name))
-    coin = request.form.get("coin-withdrawl")
-    if "," in coin:
-        coin = coin.replace(",", ".")
-    amount = request.form.get("amount-withdrawl")
-    banking_operations(get_id_by_username(name), "withdrawl", coin, amount)
-    
-    return redirect(url_for("views.profile", username=name))
+    if last_activity_check(get_id_by_username(name)) is False:
+        return redirect(url_for("views.index"))
+    else:
+        set_activity_timer(get_id_by_username(name))
+        coin = request.form.get("coin-withdrawl")
+        if "," in coin:
+            coin = coin.replace(",", ".")
+        amount = request.form.get("amount-withdrawl")
+        banking_operations(get_id_by_username(name), "withdrawl", coin, amount)
+        
+        return redirect(url_for("views.profile", username=name))
 
 
 @views.route("/download_pdf/<id>")
 def download_pdf(id):
-    set_activity_timer(id)
-    username = search_user_by_id(id)["username"]
-    csv_to_pdf(os.getcwd()+f"\\database/accounts\\{id}\\{id}.csv", id)
-    filename = os.getcwd()+f"\\database/accounts\\{id}\\{id}.pdf"
-    response = send_file(filename, as_attachment=True)
-    response.headers['Content-Disposition'] = f'attachment; filename=ECO_Statement_{username}.pdf'
-    
-    return response
+    if last_activity_check(id) is False:
+        return redirect(url_for("views.index"))
+    else:
+        set_activity_timer(id)
+        username = search_user_by_id(id)["username"]
+        csv_to_pdf(os.getcwd()+f"\\database/accounts\\{id}\\{id}.csv", id)
+        filename = os.getcwd()+f"\\database/accounts\\{id}\\{id}.pdf"
+        response = send_file(filename, as_attachment=True)
+        response.headers['Content-Disposition'] = f'attachment; filename=ECO_Statement_{username}.pdf'
+        return response
 
 
 @views.route("/statement/<name>", methods=["POST", "GET"])
 def statement(name):
     id = get_id_by_username(name)
-    set_activity_timer(id)
-    if request.method == "POST":
-        # Obter arquivo do formulário
-        file = request.files["file"]
-        # Obter nome do arquivo
-        filename = secure_filename(file.filename)
-        # Verificar se o arquivo é Excel ou CSV
-        ext = os.path.splitext(filename)[1].lower()
-        if ext == ".xlsx" or ext == ".csv" or ext == ".xls":
-            store_statement(file, filename, ext, id)
-            return "Arquivo processado com sucesso."
-        else:
-            return "Por favor, selecione um arquivo Excel ou CSV."
-    # Código GET aqui
-    expenses, expenses_dic = get_expenses(id)
-    profits, profits_dic = get_profits(id)
-    dic = {"Despesas": Decimal(expenses.split("€")[0]).quantize(Decimal('0.01')), "Lucros": Decimal(profits.split("€")[0]).quantize(Decimal('0.01'))}
-    image_base64 = get_pizza_info(dic, id, "statement")
-    return render_template("statement.html", username=name, id=get_id_by_username(name), image_base64_profits_expenses=image_base64)
+    if last_activity_check(id) is False:
+        return redirect(url_for("views.index"))
+    else:
+        set_activity_timer(id)
+        if request.method == "POST":
+            # Obter arquivo do formulário
+            file = request.files["file"]
+            # Obter nome do arquivo
+            filename = secure_filename(file.filename)
+            # Verificar se o arquivo é Excel ou CSV
+            ext = os.path.splitext(filename)[1].lower()
+            if ext == ".xlsx" or ext == ".csv" or ext == ".xls":
+                store_statement(file, filename, ext, id)
+                return "Arquivo processado com sucesso."
+            else:
+                return "Por favor, selecione um arquivo Excel ou CSV."
+        # Código GET aqui
+        expenses, expenses_dic = get_expenses(id)
+        profits, profits_dic = get_profits(id)
+        dic = {"Despesas": Decimal(expenses.split("€")[0]).quantize(Decimal('0.01')), "Lucros": Decimal(profits.split("€")[0]).quantize(Decimal('0.01'))}
+        image_base64 = get_pizza_info(dic, id, "statement")
+        return render_template("statement.html", username=name, id=get_id_by_username(name), image_base64_profits_expenses=image_base64)
 
 @views.route("/download_economic_report/<id>")
 def download_economic_report(id):
-    set_activity_timer(id)
-    output = os.getcwd()+f"\\database/accounts\\{id}\\analysis\\economic_report.pdf"
-    image_paths = [os.getcwd()+f"\\database/accounts\\{id}\\analysis\\expenses.png", os.getcwd()+f"\\database/accounts\\{id}\\analysis\\profits.png", os.getcwd()+f"\\database/accounts\\{id}\\analysis\\statement.png"]
-    expenses, expenses_dic = get_expenses(id)
-    profits, profits_dic = get_profits(id)
-    get_pizza_info(profits_dic, id, "profits") 
-    get_pizza_info(expenses_dic, id, "expenses") 
-    dic_profits_expenses = {"Despesas": Decimal(expenses.split("€")[0]).quantize(Decimal('0.01')), "Lucros": Decimal(profits.split("€")[0]).quantize(Decimal('0.01'))}
-    generate_economic_report(output, image_paths, id, dic_profits_expenses, expenses_dic, profits_dic)
-    response = send_file(os.getcwd()+f"\\database/accounts\\{id}\\analysis\\economic_report.pdf", as_attachment=True)
-    response.headers['Content-Disposition'] = f'attachment; filename=economic_report.pdf'
-    return response
+    if last_activity_check(id) is False:
+        return redirect(url_for("views.index"))
+    else:
+        set_activity_timer(id)
+        output = os.getcwd()+f"\\database/accounts\\{id}\\analysis\\economic_report.pdf"
+        image_paths = [os.getcwd()+f"\\database/accounts\\{id}\\analysis\\expenses.png", os.getcwd()+f"\\database/accounts\\{id}\\analysis\\profits.png", os.getcwd()+f"\\database/accounts\\{id}\\analysis\\statement.png"]
+        expenses, expenses_dic = get_expenses(id)
+        profits, profits_dic = get_profits(id)
+        get_pizza_info(profits_dic, id, "profits") 
+        get_pizza_info(expenses_dic, id, "expenses") 
+        dic_profits_expenses = {"Despesas": Decimal(expenses.split("€")[0]).quantize(Decimal('0.01')), "Lucros": Decimal(profits.split("€")[0]).quantize(Decimal('0.01'))}
+        generate_economic_report(output, image_paths, id, dic_profits_expenses, expenses_dic, profits_dic)
+        response = send_file(os.getcwd()+f"\\database/accounts\\{id}\\analysis\\economic_report.pdf", as_attachment=True)
+        response.headers['Content-Disposition'] = f'attachment; filename=economic_report.pdf'
+        return response
 
 
 @views.route('/expenses/<id>')
 def expenses(id):
-    expenses, expenses_dic = get_expenses(id)
-    image_base64 = get_pizza_info(expenses_dic, id, "expenses")
-    return render_template('expenses.html', expenses=expenses, expenses_dic=expenses_dic, image_base64=image_base64, id=id)
+    if last_activity_check(id) == False:
+        return redirect(url_for("views.index"))
+    else:
+        expenses, expenses_dic = get_expenses(id)
+        image_base64 = get_pizza_info(expenses_dic, id, "expenses")
+        return render_template('expenses.html', expenses=expenses, expenses_dic=expenses_dic, image_base64=image_base64, id=id)
 
 
 @views.route('/profits/<id>')
 def profits(id):
-    profits, profits_dic = get_profits(id)
-    image_base64 = get_pizza_info(profits_dic, id, "profits")
-    return render_template('profits.html', profits=profits, profits_dic=profits_dic, image_base64_profits=image_base64, id=id)
+    if last_activity_check(id) == False:
+        return redirect(url_for("views.index"))
+    else:
+        profits, profits_dic = get_profits(id)
+        image_base64 = get_pizza_info(profits_dic, id, "profits")
+        return render_template('profits.html', profits=profits, profits_dic=profits_dic, image_base64_profits=image_base64, id=id)
 
 
 @views.route("/account/<username>")
 def account(username):
-    set_activity_timer(get_id_by_username(username))
     if last_activity_check(get_id_by_username(username)) == False:
         return redirect(url_for("views.login"))
-    
-    return render_template("account.html", username=username, id=get_id_by_username(username))
+    else:
+        return render_template("account.html", username=username, id=get_id_by_username(username))
 
 @views.route("/database/accounts/<id>/<image>", methods=["POST", "GET"])
 def account_image(id, image):
-    return send_file(os.getcwd()+f"/database/accounts/{id}/{image}", mimetype='image/png')
+    if last_activity_check(id) == False:
+        return redirect(url_for("views.login"))
+    else:
+        return send_file(os.getcwd()+f"/database/accounts/{id}/{image}", mimetype='image/png')
 
 
 @views.route('/get_image/<path:filename>')
@@ -272,33 +287,33 @@ def get_image(filename):
 
 @views.route("/update_account/<id>", methods=["POST"])
 def update_account(id):
-    set_activity_timer(id)
     if last_activity_check(id) == False:
-        return redirect(url_for("views.login"))
-    # create the file path
-    file_path = os.getcwd()+f"/database/accounts/{id}/{id}.png"
-
-    # save the uploaded file
-    profile_photo = request.files.get("profile_photo")
-    if profile_photo:
-        profile_photo.save(file_path)
-
-    username = request.form.get("username")
-    email = request.form.get("email")
-    password = request.form.get("psw")
-    if username != "" and not check_username_exists(username):
-        update_username(id, username)
-        session["username"] = username
+        return redirect(url_for("views.index"))
     else:
-        username = search_user_by_id(id)["username"]
-    if email != "" and not check_email_exists(email):
-        update_email(id, email)
-    else:
-        email = search_user_by_id(id)["email"]
-    if password != "":
-        update_password(id, password)
-    
-    return redirect(url_for("views.profile", username=get_username_by_id(id)))
+        # create the file path
+        file_path = os.getcwd()+f"/database/accounts/{id}/{id}.png"
+
+        # save the uploaded file
+        profile_photo = request.files.get("profile_photo")
+        if profile_photo:
+            profile_photo.save(file_path)
+
+        username = request.form.get("username")
+        email = request.form.get("email")
+        password = request.form.get("psw")
+        if username != "" and not check_username_exists(username):
+            update_username(id, username)
+            session["username"] = username
+        else:
+            username = search_user_by_id(id)["username"]
+        if email != "" and not check_email_exists(email):
+            update_email(id, email)
+        else:
+            email = search_user_by_id(id)["email"]
+        if password != "":
+            update_password(id, password)
+        
+        return redirect(url_for("views.profile", username=get_username_by_id(id)))
 
 
 @views.route('/check_username', methods=['POST'])
@@ -321,51 +336,53 @@ def check_email():
 @views.route("/chat_home/<id>", methods=["POST", "GET"])
 def chat_home(id):
     if last_activity_check(id) == False:
-        return redirect(url_for("views.login"))
-    session.clear()
-    if request.method == "POST":
-        code = request.form.get("code")
-        join = request.form.get("join", False)
-        create = request.form.get("create", False)
+        return redirect(url_for("views.index"))
+    else:
+        session.clear()
+        if request.method == "POST":
+            code = request.form.get("code")
+            join = request.form.get("join", False)
+            create = request.form.get("create", False)
 
-        with open("cenas.txt", "w+") as f:
-                f.write("code-" + str(code) + " join-" + str(join) + " create-" + str(create))
+            with open("cenas.txt", "w+") as f:
+                    f.write("code-" + str(code) + " join-" + str(join) + " create-" + str(create))
 
-        if join != False and not code:
-            with open("cenas.txt", "a+") as f:
-                f.write("\nentrou")
-            username = get_username_by_id(id)
-            return render_template("chat_home.html", error="Please enter a room code.", code=code, name=id, username=username)
-        
+            if join != False and not code:
+                with open("cenas.txt", "a+") as f:
+                    f.write("\nentrou")
+                username = get_username_by_id(id)
+                return render_template("chat_home.html", error="Please enter a room code.", code=code, name=id, username=username)
+            
 
-        room_code = code
-        if create != False:
-            room_code = create_room()
-        elif check_room_code_exists(code) == False:
-            username = get_username_by_id(id)
-            return render_template("chat_home.html", error="Room does not exist.", code=code, name=id, username=username)
-        
-        session["room"] = room_code
-        session["name"] = get_username_by_id(id)
-        set_activity_timer(id)
-        return redirect(url_for("views.chat_room", id = id, name  = session.get("name")))
+            room_code = code
+            if create != False:
+                room_code = create_room()
+            elif check_room_code_exists(code) == False:
+                username = get_username_by_id(id)
+                return render_template("chat_home.html", error="Room does not exist.", code=code, name=id, username=username)
+            
+            session["room"] = room_code
+            session["name"] = get_username_by_id(id)
+            set_activity_timer(id)
+            return redirect(url_for("views.chat_room", id = id, name  = session.get("name")))
 
-    username = get_username_by_id(id)
-    return render_template("chat_home.html", code="", name=id, username=username)
+        username = get_username_by_id(id)
+        return render_template("chat_home.html", code="", name=id, username=username)
 
 
 @views.route("/chat_room/<id>")
 def chat_room(id):
     if last_activity_check(id) == False:
-        return redirect(url_for("views.login"))
-    room = session.get("room")
-    if room is None or check_room_code_exists(room) == False:
-        return redirect(url_for("views.chat_home", id=id))
-    messages = get_room_messages(room)
-    for element in messages:
-        element["image"] = element["image"].replace("\\", "/")
-    print(messages)
-    return render_template("chat_room.html", code=room, messages=messages, id=id, name=get_username_by_id(id))
+        return redirect(url_for("views.index"))
+    else:
+        room = session.get("room")
+        if room is None or check_room_code_exists(room) == False:
+            return redirect(url_for("views.chat_home", id=id))
+        messages = get_room_messages(room)
+        for element in messages:
+            element["image"] = element["image"].replace("\\", "/")
+        print(messages)
+        return render_template("chat_room.html", code=room, messages=messages, id=id, name=get_username_by_id(id))
 
 
 def new_message(data):
@@ -391,7 +408,6 @@ def new_message(data):
 
 
 def on_connect(auth, place):
-    print("PLACE------------------", place)
     if "profile" in place:
         name = place.split("/")[-1]
         id = get_id_by_username(name)
