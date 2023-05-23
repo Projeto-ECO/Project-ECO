@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Account Settings</title>
+    <link rel="icon" type="image/png" href="{{ url_for('views.get_image', filename='database/accounts/' + id + '/' + id + '.png') }}"/>
     <link rel="stylesheet" href="{{url_for('static', filename='css/account.css')}}">
     <link rel="stylesheet" href="{{url_for('static', filename='css/portfolio.css')}}">
     <link rel="stylesheet" href="{{url_for('static', filename='css/home.css')}}">
@@ -10,7 +11,7 @@
 </head>
 <body style="margin-top: 7%;">
 <h2>Account Settings</h2>
-<img src="{{ url_for('views.get_image', filename='accounts/' + id + '/' + id + '.png') }}" alt="Profile Photo" class="profile-image" style="margin-top: 70px;">
+<img src="{{ url_for('views.get_image', filename='database/accounts/' + id + '/' + id + '.png') }}" alt="Profile Photo" class="profile-image" style="margin-top: 70px;">
 <h2>{{username}}</h2>
 <form action="/update_account/{{id}}" method="post" enctype="multipart/form-data" onsubmit="return validateForm();" style="margin-top: 70px;">
     <div class="container">

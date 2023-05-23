@@ -1,10 +1,11 @@
 from time import localtime, strftime
 import time
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for, session, send_file
-from handlers import *
+from handlers.processing_handlers import *
+from handlers.activity_handler import *
+from handlers.financial_module import *
 from flask_socketio import send, leave_room, join_room
 from werkzeug.utils import secure_filename
-from converter import clean_csv_file, convert_excel_to_csv
 
 
 views = Blueprint(__name__, "views")
@@ -37,14 +38,14 @@ def profile(username):
         return redirect(url_for("views.index"))
 
 
-@views.route("db_handler/users.json")
+@views.route("database/users.json")
 def get_users():
-    return jsonify(read_json("\\db_handler\\users.json"))
+    return jsonify(read_json("\\database\\users.json"))
 
 
 @views.route("/data/<id>")
 def get_data(id):
-    return jsonify(read_json("/accounts/"+id+"\\"+id+".json"))
+    return jsonify(read_json("/database/accounts/"+id+"\\"+id+".json"))
 
 
 @views.route("/go-to-home")
@@ -56,7 +57,7 @@ def go_to_home():
 def two_factor_auth_login(username):
     code = session.get("code")
     print(code)
-    data = read_json("\\db_handler\\users.json")
+    data = read_json("\\database\\users.json")
     for user in data["users"]:
         if user["username"] == username:
             if user["active"] == True and last_activity_check(user["id"]): # check if user is already authenticated
@@ -66,7 +67,7 @@ def two_factor_auth_login(username):
                     entered_code = request.form.get("code")
                     if entered_code == code:
                         user["active"] = True
-                        write_json("\\db_handler\\users.json", data)
+                        write_json("\\database\\users.json", data)
                         set_activity_timer(user["id"])
                         session["username"] = username
                         session["id"] = get_id_by_username(username)
@@ -94,6 +95,8 @@ def login():
     if request.method == "POST":
         username = request.form.get("username")
         password = request.form.get("password")
+        if " " in username and len(username.split(" ")) == 2:
+            username = username.replace(" ", "")
         if validate_login(username, password) is False:
             return render_template("login.html", message="User or password are incorrect.")
         else:
@@ -188,8 +191,8 @@ def withdrawl(name):
 def download_pdf(id):
     set_activity_timer(id)
     username = search_user_by_id(id)["username"]
-    csv_to_pdf(os.getcwd()+f"\\accounts\\{id}\\{id}.csv", id)
-    filename = os.getcwd()+f"\\accounts\\{id}\\{id}.pdf"
+    csv_to_pdf(os.getcwd()+f"\\database/accounts\\{id}\\{id}.csv", id)
+    filename = os.getcwd()+f"\\database/accounts\\{id}\\{id}.pdf"
     response = send_file(filename, as_attachment=True)
     response.headers['Content-Disposition'] = f'attachment; filename=ECO_Statement_{username}.pdf'
     
@@ -222,15 +225,15 @@ def statement(name):
 @views.route("/download_economic_report/<id>")
 def download_economic_report(id):
     set_activity_timer(id)
-    output = os.getcwd()+f"\\accounts\\{id}\\analysis\\economic_report.pdf"
-    image_paths = [os.getcwd()+f"\\accounts\\{id}\\analysis\\expenses.png", os.getcwd()+f"\\accounts\\{id}\\analysis\\profits.png", os.getcwd()+f"\\accounts\\{id}\\analysis\\statement.png"]
+    output = os.getcwd()+f"\\database/accounts\\{id}\\analysis\\economic_report.pdf"
+    image_paths = [os.getcwd()+f"\\database/accounts\\{id}\\analysis\\expenses.png", os.getcwd()+f"\\database/accounts\\{id}\\analysis\\profits.png", os.getcwd()+f"\\database/accounts\\{id}\\analysis\\statement.png"]
     expenses, expenses_dic = get_expenses(id)
     profits, profits_dic = get_profits(id)
     get_pizza_info(profits_dic, id, "profits") 
     get_pizza_info(expenses_dic, id, "expenses") 
     dic_profits_expenses = {"Despesas": Decimal(expenses.split("€")[0]).quantize(Decimal('0.01')), "Lucros": Decimal(profits.split("€")[0]).quantize(Decimal('0.01'))}
     generate_economic_report(output, image_paths, id, dic_profits_expenses, expenses_dic, profits_dic)
-    response = send_file(os.getcwd()+f"\\accounts\\{id}\\analysis\\economic_report.pdf", as_attachment=True)
+    response = send_file(os.getcwd()+f"\\database/accounts\\{id}\\analysis\\economic_report.pdf", as_attachment=True)
     response.headers['Content-Disposition'] = f'attachment; filename=economic_report.pdf'
     return response
 
@@ -257,9 +260,9 @@ def account(username):
     
     return render_template("account.html", username=username, id=get_id_by_username(username))
 
-@views.route("/accounts/<id>/<image>", methods=["POST", "GET"])
+@views.route("/database/accounts/<id>/<image>", methods=["POST", "GET"])
 def account_image(id, image):
-    return send_file(os.getcwd()+f"/accounts/{id}/{image}", mimetype='image/png')
+    return send_file(os.getcwd()+f"/database/accounts/{id}/{image}", mimetype='image/png')
 
 
 @views.route('/get_image/<path:filename>')
@@ -273,7 +276,7 @@ def update_account(id):
     if last_activity_check(id) == False:
         return redirect(url_for("views.login"))
     # create the file path
-    file_path = os.getcwd()+f"/accounts/{id}/{id}.png"
+    file_path = os.getcwd()+f"/database/accounts/{id}/{id}.png"
 
     # save the uploaded file
     profile_photo = request.files.get("profile_photo")
@@ -428,11 +431,11 @@ def on_disconnect(place):
         print(f"{name} disconnected from room {room}")
 
         if check_room_code_exists(room):
-            data = read_json("\\db_handler\\rooms.json")
+            data = read_json("\\database\\rooms.json")
             for room in data["rooms"]:
                 if room["code"] == session.get("room"):
                     room["members"].remove({"name": name, "id": get_id_by_username(name)})
-                    write_json("\\db_handler\\rooms.json", data)
+                    write_json("\\database\\rooms.json", data)
                     break
             room = session.get("room")
             time.sleep(5)

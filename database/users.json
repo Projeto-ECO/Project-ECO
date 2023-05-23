@@ -37,8 +37,8 @@
             "password": "1656",
             "email": "tiagofonseca2002@hotmail.com",
             "id": "696582",
-            "active": true,
-            "last_activity": "18-05-2023 09:10:51"
+            "active": false,
+            "last_activity": "23-05-2023 14:12:02"
         },
         {
             "username": "lucasmatos7",
@@ -63,6 +63,14 @@
             "id": "762695",
             "active": true,
             "last_activity": "18-05-2023 09:25:04"
+        },
+        {
+            "username": "Eco",
+            "password": "1656",
+            "email": "t.fonseca@ua.pt",
+            "id": "307931",
+            "active": false,
+            "last_activity": "23-05-2023 13:23:24"
         }
     ]
 }

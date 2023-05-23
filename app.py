@@ -1,5 +1,5 @@
 from flask import Flask, request
-from views import views, new_message, on_connect, on_disconnect, inactivate_account, activate_account
+from views import views, new_message, on_connect, on_disconnect
 from flask_socketio import SocketIO
 
 

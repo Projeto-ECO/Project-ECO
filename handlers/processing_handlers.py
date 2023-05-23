@@ -8,7 +8,8 @@ import shutil
 import bleach
 import matplotlib.pyplot as plt
 import numpy as np
-from converter import *
+from handlers.converter import *
+from handlers.db_coordinator import *
 from decimal import Decimal
 from datetime import datetime
 from string import ascii_uppercase
@@ -17,7 +18,7 @@ from reportlab.lib.units import inch
 from reportlab.lib.colors import Color
 from reportlab.lib.enums import TA_CENTER
 from reportlab.lib.pagesizes import letter
-from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+from reportlab.lib.styles import ParagraphStyle
 from reportlab.platypus import Table, TableStyle, SimpleDocTemplate, Image, Paragraph, Spacer, PageBreak
 
 
@@ -93,47 +94,9 @@ def generate_two_factor_auth_code():
     return str(random.randint(100000, 999999))
 
 
-def read_json(filename):
-    directory = os.getcwd()
-
-    # Check if the file exists and handle specific cases
-    if not os.path.exists(directory + filename):
-        if filename == "\\db_handler\\users.json":
-            # Create a new file and initialize it with an empty "users" list
-            write_json(filename, {"users": []})
-        elif filename == "\\db_handler\\rooms.json":
-            # Create a new file and initialize it with an empty "rooms" list
-            write_json(filename, {"rooms": []})
-
-        # Set the data to None since the file was just created
-        data = None
-    else:
-        # Read the file and load its content as JSON
-        with open(directory + filename) as file:
-            data = json.load(file)
-
-    return data
-
-
-def write_json(file, data):
-    directory = os.getcwd()
-    file_dir = file.split("\\")[0]
-
-    # Check if the directory exists, create it if it doesn't
-    if not os.path.exists(directory + file_dir):
-        os.makedirs(directory + file_dir)
-        print("Created directory:", directory + file_dir)
-
-    # Write the JSON data to the file with proper indentation
-    with open(directory + file, "w+") as f:
-        json.dump(data, f, indent=4)
-
-    return True
-
-
 def search_user_by_id(id):
     # Read the users.json file
-    data = read_json("\\db_handler\\users.json")
+    data = read_json("\\database\\users.json")
 
     # If data is None, return None
     if data is None:
@@ -147,7 +110,7 @@ def search_user_by_id(id):
 
 def search_user_by_email(email):
     # Read the users.json file
-    data = read_json("\\db_handler\\users.json")
+    data = read_json("\\database\\users.json")
 
     # If data is None, return None
     if data is None:
@@ -161,7 +124,7 @@ def search_user_by_email(email):
 
 def search_user_by_username(username):
     # Read the users.json file
-    data = read_json("\\db_handler\\users.json")
+    data = read_json("\\database\\users.json")
 
     # If data is None, return None
     if data is None:
@@ -266,7 +229,7 @@ def generate_random_id():
 
 def check_id_existence(id):
     # Read the users.json file
-    data = read_json("\\db_handler\\users.json")
+    data = read_json("\\database\\users.json")
 
     # If data is None, return False
     if data is None:
@@ -283,7 +246,7 @@ def check_id_existence(id):
 
 def get_id_by_username(username):
     # Read the users.json file
-    data = read_json("\\db_handler\\users.json")
+    data = read_json("\\database\\users.json")
 
     # If data is None, return None
     if data is None:
@@ -301,7 +264,7 @@ def get_id_by_username(username):
 
 def get_username_by_id(id):
     # Read the users.json file
-    data = read_json("\\db_handler\\users.json")
+    data = read_json("\\database\\users.json")
 
     # If data is None, return None
     if data is None:
@@ -316,188 +279,28 @@ def get_username_by_id(id):
     return None
 
 
-def check_if_online(username):
-    # Read the users.json file
-    data = read_json("\\db_handler\\users.json")
-
-    # Search for the user with the given username
-    for user in data["users"]:
-        if user["username"] == username:
-            return user["active"]
-
-    # If no user is found, return None
-    return None
-
-
 def check_image_existence(id):
     directory = os.getcwd()
 
     # Check if the image file exists
-    if not os.path.exists(directory + f"\\accounts\\{id}\\{id}.png"):
+    if not os.path.exists(directory + f"\\database\\accounts\\{id}\\{id}.png"):
         return False
     else:
         return True
-
-
-def banking_operations(id, operation, coin, amount):
-    # Convert amount to integer and coin to a formatted string with 2 decimal places
-    amount = int(amount)
-    coin = "{:.2f}".format(float(coin))
-
-    # Read the account data from the JSON file
-    data = read_json("\\accounts\\" + id + "\\" + id + ".json")
-
-    if operation == "deposit":
-        # Perform deposit operation
-        for coin_ in data["coins"]:
-            if str(coin_["name"]) == str(coin):
-                if register_operation(id, operation, coin, amount):
-                    data["coinAmounts"][coin] = data["coinAmounts"][coin] + amount
-                    write_json("\\accounts\\" + id + "\\" + id + ".json", data)
-                    break
-                else:
-                    return False
-    elif operation == "withdrawl":
-        # Perform withdrawal operation
-        for coin_ in data["coins"]:
-            if str(coin_["name"]) == str(coin) and data["coinAmounts"][coin] >= amount and amount > 0:
-                if register_operation(id, operation, coin, amount):
-                    data["coinAmounts"][coin] = data["coinAmounts"][coin] - amount
-                    write_json("\\accounts\\" + id + "\\" + id + ".json", data)
-                    break
-                else:
-                    return False
-
-    # Return True to indicate the operation was successful
-    return True
-
-
-def inactivate_user(id):
-    # Read the users.json file
-    data = read_json("\\db_handler\\users.json")
-
-    # Search for the user with the given ID
-    for user in data["users"]:
-        if user["id"] == id:
-            # Set the user's active status to False
-            user["active"] = False
-
-            # Write the updated data back to users.json
-            write_json("\\db_handler\\users.json", data)
-
-            # Print a message indicating successful inactivation
-            print(f"User {id} has been inactivated")
-
-            # Return True to indicate successful inactivation
-            return True
-
-    # If no user is found, return False
-    return False
-
-
-def activate_user(id):
-    # Read the users.json file
-    data = read_json("\\db_handler\\users.json")
-
-    # Search for the user with the given ID
-    for user in data["users"]:
-        if user["id"] == id:
-            # Set the user's active status to True
-            user["active"] = True
-
-            # Write the updated data back to users.json
-            write_json("\\db_handler\\users.json", data)
-
-            # Return True to indicate successful activation
-            return True
-
-    # If no user is found, return False
-    return False
 
 
 def check_statement_existence(id):
     directory = os.getcwd()
 
     # Check if the statement file exists
-    if not os.path.exists(directory + f"\\accounts\\{id}\\{id}.csv"):
+    if not os.path.exists(directory + f"\\database\\accounts\\{id}\\{id}.csv"):
         # Create a new statement file and write the header row
-        with open(directory + f"\\accounts\\{id}\\{id}.csv", "w+", newline="", encoding="utf8") as file:
+        with open(directory + f"\\database\\accounts\\{id}\\{id}.csv", "w+", newline="", encoding="utf8") as file:
             csv_writer = csv.writer(file, delimiter=";")
             csv_writer.writerow(["Data", "Descrição", "Montante", "Saldo Contabilístico"])
 
     # Return True to indicate the existence of the statement file
     return True
-
-
-def register_operation(id, operation, coin, amount):
-    # Get the current account balance
-    accountBalance = get_account_balance(id)
-
-    try:
-        # Check if the statement file exists and create it if necessary
-        if check_statement_existence(id):
-            directory = os.getcwd()
-            total = float(coin) * float(amount)
-
-            if operation == "deposit":
-                # Update account balance for a deposit
-                accountBalance += total
-            elif operation == "withdrawl":
-                # Update account balance for a withdrawal
-                accountBalance -= total
-                total = -total
-            else:
-                # Invalid operation
-                return False
-
-            # Create a new statement row
-            statement_row = [
-                datetime.now().strftime('%d-%m-%Y'),
-                operation.title(),
-                "{:.2f}".format(total) + " €",
-                "{:.2f}".format(accountBalance) + " €"
-            ]
-
-            # Read existing rows from the statement file
-            with open(directory + f"\\accounts\\{id}\\{id}.csv", "r", newline="", encoding="utf8") as file:
-                csv_reader = csv.reader(file, delimiter=";")
-                existing_rows = [row for row in csv_reader]
-
-            # Write the new statement row along with the existing rows to the statement file
-            with open(directory + f"\\accounts\\{id}\\{id}.csv", "w", newline="", encoding="utf8") as file:
-                csv_writer = csv.writer(file, delimiter=";")
-                csv_writer.writerows([existing_rows[0], statement_row] + existing_rows[1:])
-
-            # Return True to indicate successful operation registration
-            return True
-
-    except:
-        # An error occurred
-        return False
-
-
-def get_statement(id):
-    # Open the statement file for reading
-    with open(os.getcwd() + f"\\accounts\\{id}\\{id}.csv", "r") as file:
-        # Read the CSV content using the CSV reader
-        csv_reader = csv.reader(file, delimiter=";")
-        # Convert the CSV reader object to a list and return it
-        return list(csv_reader)
-
-
-def get_account_balance(id):
-    # Read the JSON data from the account file
-    data = read_json("\\accounts\\" + id + "\\" + id + ".json")
-
-    # Initialize the total balance
-    total = 0
-
-    # Calculate the total balance by multiplying the coin amounts with their respective values
-    for coin_ in data["coins"]:
-        total += float(data["coinAmounts"][coin_["name"]]) * float(coin_["value"])
-
-    # Return the total account balance
-    return total
 
 
 def csv_to_pdf(csv_path, id):
@@ -554,7 +357,7 @@ def csv_to_pdf(csv_path, id):
         alignment=TA_CENTER
     )
     username = search_user_by_id(id)["username"]
-    username_text = f"Username: {username} ({id})"
+    username_text = f"{username} ({id})"
     username_para = Paragraph(username_text, username_style)
 
     # Create the date and time paragraph
@@ -586,7 +389,7 @@ def csv_to_pdf(csv_path, id):
 
 def update_username(id, username):
     # Read user data from the JSON file
-    data = read_json("\\db_handler\\users.json")
+    data = read_json("\\database\\users.json")
     
     # Iterate over each user in the data
     for user in data["users"]:
@@ -595,7 +398,7 @@ def update_username(id, username):
             # Update the username for the matching user
             user["username"] = username
             # Write the modified data back to the JSON file
-            write_json("\\db_handler\\users.json", data)
+            write_json("\\database\\users.json", data)
             # Return True to indicate successful username update
             return True
     
@@ -605,7 +408,7 @@ def update_username(id, username):
 
 def update_email(id, email):
     # Read user data from the JSON file
-    data = read_json("\\db_handler\\users.json")
+    data = read_json("\\database\\users.json")
     
     # Iterate over each user in the data
     for user in data["users"]:
@@ -614,7 +417,7 @@ def update_email(id, email):
             # Update the email for the matching user
             user["email"] = email
             # Write the modified data back to the JSON file
-            write_json("\\db_handler\\users.json", data)
+            write_json("\\database\\users.json", data)
             # Return True to indicate successful email update
             return True
     
@@ -624,7 +427,7 @@ def update_email(id, email):
 
 def update_password(id, password):
     # Read user data from the JSON file
-    data = read_json("\\db_handler\\users.json")
+    data = read_json("\\database\\users.json")
     
     # Iterate over each user in the data
     for user in data["users"]:
@@ -633,7 +436,7 @@ def update_password(id, password):
             # Update the password for the matching user
             user["password"] = password
             # Write the modified data back to the JSON file
-            write_json("\\db_handler\\users.json", data)
+            write_json("\\database\\users.json", data)
             # Return True to indicate successful password update
             return True
     
@@ -643,7 +446,7 @@ def update_password(id, password):
 
 def check_username_exists(username):
     # Read user data from the JSON file
-    data = read_json("\\db_handler\\users.json")
+    data = read_json("\\database\\users.json")
     
     # Iterate over each user in the data
     for user in data["users"]:
@@ -658,7 +461,7 @@ def check_username_exists(username):
 
 def check_email_exists(email):
     # Read user data from the JSON file
-    data = read_json("\\db_handler\\users.json")
+    data = read_json("\\database\\users.json")
     
     # Iterate over each user in the data
     for user in data["users"]:
@@ -676,11 +479,11 @@ def create_user_folder(id):
     directory = os.getcwd()
 
     # Create a directory for the user using their ID
-    os.mkdir(directory+f"\\accounts\\{id}")
+    os.mkdir(directory+f"\\database\\accounts\\{id}")
 
     # Set the paths for the source and destination files
     src_path = directory+f"\\static\\images\\default.png"
-    dst_path = directory+f"\\accounts\\{id}\\{id}.png"
+    dst_path = directory+f"\\database\\accounts\\{id}\\{id}.png"
 
     # Copy the source file to the destination file
     shutil.copy(src_path, dst_path)
@@ -691,13 +494,13 @@ def create_room():
     room_code = generate_unique_code(4)
     
     # Read the rooms data from JSON file
-    data = read_json("\\db_handler\\rooms.json")
+    data = read_json("\\database\\rooms.json")
     
     # Add the new room to the data
     data["rooms"].append({"code": room_code, "members": [], "messages": []})
     
     # Write the updated data back to the JSON file
-    write_json("\\db_handler\\rooms.json", data)
+    write_json("\\database\\rooms.json", data)
     
     # Return the generated room code
     return room_code
@@ -705,7 +508,7 @@ def create_room():
 
 def get_rooms():
     # Read the rooms data from JSON file
-    data = read_json("\\db_handler\\rooms.json")
+    data = read_json("\\database\\rooms.json")
     
     # Return the data containing all the rooms
     return data
@@ -728,7 +531,7 @@ def generate_unique_code(length):
 
 
 def check_room_code_exists(code):
-    data = read_json("\\db_handler\\rooms.json")
+    data = read_json("\\database\\rooms.json")
     
     # Check if the rooms list is empty
     if data["rooms"] == []:
@@ -745,7 +548,7 @@ def check_room_code_exists(code):
 
 
 def get_room_messages(code):
-    data = read_json("\\db_handler\\rooms.json")
+    data = read_json("\\database\\rooms.json")
     
     # Iterate over each room in the data
     for room in data["rooms"]:
@@ -766,7 +569,7 @@ def get_room_messages(code):
 
 
 def get_room_members(code):
-    data = read_json("\\db_handler\\rooms.json")
+    data = read_json("\\database\\rooms.json")
     
     # Iterate over each room in the data
     for room in data["rooms"]:
@@ -780,7 +583,7 @@ def get_room_members(code):
 
 
 def add_room_member(code, name, id):
-    data = read_json("\\db_handler\\rooms.json")
+    data = read_json("\\database\\rooms.json")
     
     # Get the current members of the room
     members = get_room_members(code)
@@ -796,7 +599,7 @@ def add_room_member(code, name, id):
         if room["code"] == code:
             # Add the new member to the room
             room["members"].append({"name": name, "id": id})
-            write_json("\\db_handler\\rooms.json", data)
+            write_json("\\database\\rooms.json", data)
             return True
     
     # If no matching room is found, return False
@@ -804,7 +607,7 @@ def add_room_member(code, name, id):
 
 
 def add_room_message(code, message):
-    data = read_json("\\db_handler\\rooms.json")
+    data = read_json("\\database\\rooms.json")
     
     # Iterate over each room in the data
     for room in data["rooms"]:
@@ -812,7 +615,7 @@ def add_room_message(code, message):
         if room["code"] == code:
             # Add the message to the room's messages
             room["messages"].append(message)
-            write_json("\\db_handler\\rooms.json", data)
+            write_json("\\database\\rooms.json", data)
             return True
     
     # If no matching room is found, return False
@@ -820,7 +623,7 @@ def add_room_message(code, message):
 
 
 def get_number_of_room_members(code):
-    data = read_json("\\db_handler\\rooms.json")
+    data = read_json("\\database\\rooms.json")
     rooms = data["rooms"]
     number = 0
     
@@ -835,7 +638,7 @@ def get_number_of_room_members(code):
 
 
 def delete_room(id):
-    data = read_json("\\db_handler\\rooms.json")
+    data = read_json("\\database\\rooms.json")
     rooms = data["rooms"]
     
     # Iterate over each room in the data
@@ -844,51 +647,15 @@ def delete_room(id):
         if room["code"] == id:
             # Remove the room from the list
             rooms.remove(room)
-            write_json("\\db_handler\\rooms.json", data)
+            write_json("\\database\\rooms.json", data)
             return True
-    
-    return False
-
-
-def set_activity_timer(id):
-    data = read_json("\\db_handler\\users.json")
-    for user in data["users"]:
-        # Check if the user id matches the provided id
-        if user["id"] == id:
-            # Update the last activity timestamp with the current date and time
-            user["last_activity"] = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
-            write_json("\\db_handler\\users.json", data)
-            return True
-    
-    return False
-
-
-def last_activity_check(id):
-    data = read_json("\\db_handler\\users.json")
-    for user in data["users"]:
-        # Check if the user id matches the provided id and if last_activity is not None
-        if user["id"] == id and user["last_activity"] is not None:
-            last_activity = datetime.strptime(user["last_activity"], "%d-%m-%Y %H:%M:%S")
-            now = datetime.now()
-            difference = now - last_activity
-            
-            # Print the time difference in seconds (for testing/debugging)
-            print(difference)
-            print(difference.total_seconds())
-            
-            if difference.total_seconds() > 600:  # 10 minutes
-                inactivate_user(id)
-                return False
-            else:
-                set_activity_timer(id)
-                return True
     
     return False
 
 
 def get_image_path(id):
     # Construct the image path based on the provided user id
-    return f"\\accounts\\{id}\\{id}.png"
+    return f"\\database\\accounts\\{id}\\{id}.png"
 
 
 def create_user(username, password, email):
@@ -906,13 +673,13 @@ def create_user(username, password, email):
     }
 
     # Read the existing users data
-    data = read_json("\\db_handler\\users.json")
+    data = read_json("\\database\\users.json")
 
     # Append the new user data to the existing users list
     data["users"].append(data_to_add)
 
     # Write the updated users data back to the users.json file
-    write_json("\\db_handler\\users.json", data)
+    write_json("\\database\\users.json", data)
 
     # Define the initial coin data for the user
     json_coins = {
@@ -954,7 +721,7 @@ def create_user(username, password, email):
     create_user_folder(id)
 
     # Write the initial coin data to the user's JSON file
-    write_json("\\accounts\\" + id + "\\" + id + ".json", json_coins)
+    write_json("\\database\\accounts\\" + id + "\\" + id + ".json", json_coins)
 
     # Return the created user
     return id
@@ -962,11 +729,11 @@ def create_user(username, password, email):
 
 def store_statement(file, filename, ext, id):
     # Save the file to disk
-    file_path = os.path.join(os.getcwd(), "accounts", id, "uploads", filename)
+    file_path = os.path.join(os.getcwd(), "database\\accounts", id, "uploads", filename)
     
     # Create the directory if it doesn't exist
-    if not os.path.exists(os.path.join(os.getcwd(), "accounts", id, "uploads")):
-        os.makedirs(os.path.join(os.getcwd(), "accounts", id, "uploads"))
+    if not os.path.exists(os.path.join(os.getcwd(), "database\\accounts", id, "uploads")):
+        os.makedirs(os.path.join(os.getcwd(), "database\\accounts", id, "uploads"))
     
     # Save the file
     file.save(file_path)
@@ -988,7 +755,7 @@ def store_statement(file, filename, ext, id):
     lst = get_statement_data(file_path)
     
     # Define the path for storing bank-specific statement data
-    file_path_bank = os.path.join(os.getcwd(), "accounts", id, "uploads", bank + ".csv")
+    file_path_bank = os.path.join(os.getcwd(), "database\\accounts", id, "uploads", bank + ".csv")
     
     if lst != []:
         # Store the statement data in a bank-specific file
@@ -1066,7 +833,7 @@ def store_external_statement_data(lst, filepath, bank):
 
 
 def clean_platform_csv(id):
-    csv_file_path = os.path.join(os.getcwd(), "accounts", id, f"{id}.csv")
+    csv_file_path = os.path.join(os.getcwd(), "database\\accounts", id, f"{id}.csv")
     
     # Check if the CSV file exists
     if not os.path.exists(csv_file_path):
@@ -1088,7 +855,7 @@ def clean_platform_csv(id):
 
 
 def foreign_statement(bank, id):
-    csv_file_path = os.path.join(os.getcwd(), "accounts", id, "uploads", f"{bank}.csv")
+    csv_file_path = os.path.join(os.getcwd(), "database\\accounts", id, "uploads", f"{bank}.csv")
     
     # Check if the CSV file exists
     if not os.path.exists(csv_file_path):
@@ -1155,18 +922,18 @@ def read_csv_statement_file(filepath):
 def get_expenses(id):
     # Check if CGD bank statement exists for the given ID
     if check_bank_statement_exists("CGD", id):
-        cgd = read_csv_statement_file(os.getcwd()+f"\\accounts\\{id}\\uploads\\CGD.csv")
+        cgd = read_csv_statement_file(os.getcwd()+f"\\database\\accounts\\{id}\\uploads\\CGD.csv")
     else:
         cgd = []
 
     # Check if Santander bank statement exists for the given ID
     if check_bank_statement_exists("Santander", id):
-        santander = read_csv_statement_file(os.getcwd()+f"\\accounts\\{id}\\uploads\\Santander.csv")
+        santander = read_csv_statement_file(os.getcwd()+f"\\database\\accounts\\{id}\\uploads\\Santander.csv")
     else:
         santander = []
 
     # Get statement data from the eco statement file
-    eco_statement = get_statement_data(os.getcwd()+f"\\accounts\\{id}\\{id}.csv")
+    eco_statement = get_statement_data(os.getcwd()+f"\\database\\accounts\\{id}\\{id}.csv")
 
     # Remove currency symbols and spaces from the statement data
     for element in eco_statement:
@@ -1194,18 +961,18 @@ def get_expenses(id):
 def get_profits(id):
     # Check if CGD bank statement exists for the given ID
     if check_bank_statement_exists("CGD", id):
-        cgd = read_csv_statement_file(os.getcwd()+f"\\accounts\\{id}\\uploads\\CGD.csv")
+        cgd = read_csv_statement_file(os.getcwd()+f"\\database\\accounts\\{id}\\uploads\\CGD.csv")
     else:
         cgd = []
 
     # Check if Santander bank statement exists for the given ID
     if check_bank_statement_exists("Santander", id):
-        santander = read_csv_statement_file(os.getcwd()+f"\\accounts\\{id}\\uploads\\Santander.csv")
+        santander = read_csv_statement_file(os.getcwd()+f"\\database\\accounts\\{id}\\uploads\\Santander.csv")
     else:
         santander = []
 
     # Get statement data from the eco statement file
-    eco_statement = get_statement_data(os.getcwd()+f"\\accounts\\{id}\\{id}.csv")
+    eco_statement = get_statement_data(os.getcwd()+f"\\database\\accounts\\{id}\\{id}.csv")
 
     # Remove currency symbols and spaces from the statement data
     for element in eco_statement:
@@ -1231,13 +998,13 @@ def get_profits(id):
 
 
 def check_bank_statement_exists(bank, id):
-    filepath = os.getcwd() + f"\\accounts\\{id}\\uploads\\{bank}.csv"
+    filepath = os.getcwd() + f"\\database\\accounts\\{id}\\uploads\\{bank}.csv"
     return os.path.exists(filepath)
 
 
 def filter_operations(dic):
     # Read the JSON file
-    with open(os.getcwd()+"\\db_handler\\categories.json", "r", encoding="utf8") as f:
+    with open(os.getcwd()+"\\database\\categories.json", "r", encoding="utf8") as f:
         data = json.load(f)
 
     # Get the dictionaries from the JSON data
@@ -1329,7 +1096,7 @@ def get_pizza_info(dic, id, page):
     plt.axis('equal')
 
     # Create the directory if it doesn't exist
-    dir_path = os.path.join(os.getcwd(), f"accounts/{id}/analysis")
+    dir_path = os.path.join(os.getcwd(), f"database\\accounts/{id}/analysis")
     os.makedirs(dir_path, exist_ok=True)
 
     # Save the figure in the directory

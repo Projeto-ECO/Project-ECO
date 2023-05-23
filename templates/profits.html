@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/icons/extrato-bancario.ico') }}"/>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/statement.css') }}">
     <link rel="stylesheet" href="{{url_for('static', filename='css/portfolio.css')}}">
     <link rel="stylesheet" href="{{url_for('static', filename='css/home.css')}}">
@@ -34,7 +35,7 @@
             </table>
         </div>
         <div class="graph-wrapper">
-            <img src="{{ url_for('views.get_image', filename='accounts/' + id + '/' + 'analysis' + '/' + 'profits.png') }}" style="margin-right: 10%;">
+            <img src="{{ url_for('views.get_image', filename='database/accounts/' + id + '/' + 'analysis' + '/' + 'profits.png') }}" style="margin-right: 10%;">
         </div>
     </div>
 </body>

@@ -2,7 +2,7 @@
 
 <form method="post" class="buttons" style="margin-top: 17%;">
     <div class="profile">
-        <img src="{{ url_for('views.get_image', filename='accounts/' + name + '/' + name + '.png') }}" alt="Profile image" style="max-width: 100px; max-height: 100px;">
+        <img src="{{ url_for('views.get_image', filename='database/accounts/' + name + '/' + name + '.png') }}" alt="Profile image" style="max-width: 100px; max-height: 100px;">
         <div class="username">{{username}}</div>
     </div>
     <h3>Enter The Chat Room</h3>
