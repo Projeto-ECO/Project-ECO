@@ -1039,6 +1039,7 @@ def filter_operations(dic):
                 break
         else:
             # If no match is found, add the value to the "Outros" category
+            print(element)
             dic_operations["Outros"] += valor
 
     # Iterate over each element in the categorized operation dictionary

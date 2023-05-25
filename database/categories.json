@@ -1,6 +1,8 @@
 {
     "dic_operations" : {
         "Compras": 0,
+        "Streaming" : 0,
+        "Jogos" : 0,
         "Transferências": 0,
         "Levantamentos": 0,
         "Depósitos": 0,
@@ -25,7 +27,9 @@
         "Outros": 0
     },
     "dic_options" : {
-        "Compras": ["COMPRA", "COMPRAS", "AMZN", "PAGAMENTO", "PAGAMENTOS"],
+        "Compras": ["COMPRA", "COMPRAS", "AMZN", "PAGAMENTO", "PAGAMENTOS", "MERCADONA", "SERDIAL", "DECATHLON", "HIPAY SAS", "HIPAY", "PAYPAL"],
+        "Streaming" : ["SPOTIFY", "NETFLIX", "AMAZON", "AMAZON.COM", "AMAZON UK", "AMAZON UK MARKETPLACE", "AMAZO"],
+        "Jogos" : ["STEAM", "STEAMGAMES", "STEAMPOWERED", "STEAMPOWERED.COM", "STEAMPOWERED.COM/BILL"],
         "Transferências": ["TRANSFERÊNCIA", "TRF", "TFI"],
         "Levantamentos": ["LEVANTAMENTO", "WITHDRAWL"],
         "Depósitos": ["Deposit", "DEPOSITO", "DEPOSIT"],
@@ -33,9 +37,9 @@
         "Comissões": ["Comissão", "COMISSÃO", "COMISSAO"],
         "Carregamentos": ["Carregamento", "CARREGAMENTO"],
         "Impostos": ["IMPOSTO", "IMPOSTOS"],
-        "Transportes": ["TIP", "TRANSPORTE", "TRANSPORTES", "UBER", "BOLT", "TAXI", "AVEIROBUS", "TRANSDEV", "CP", "COMBOIOS", "METRO", "METRO DO PORTO", "METRO DO PORTO, S.A."],
+        "Transportes": ["TIP", "TRANSPORTE", "TRANSPORTES", "UBER", "BOLT", "TAXI", "AVEIROBUS", "TRANSDEV", "CP", "COMBOIOS", "METRO", "METRO DO PORTO", "METRO DO PORTO, S.A.", "METRO DO PORTO, S.A.", "TD EXPRESSOS"],
         "Telecomunicações": ["VODAFONE", "NOS", "MEO", "NOWO", "NOWO - COMUNICAÇÕES, S.A.", "VODAFONE.PT"],
-        "Viagens": ["EASYJET"],
+        "Viagens": ["EASYJET",  "TAP", "TAP AIR PORTUGAL", "TAP AIR PORTUGAL, S.A.", "TAP AIR PORTUGAL, S.A.", "RYANAIR", "EMIRATES", "AIRBNB", "AIRBNB.COM"],
         "Hotelaria": ["HOTEL", "HOTELARIA"],
         "Ordenados": ["Ordenado", "ORDENADO", "SALÁRIO", "SALARIO"],
         "Restauração": ["ARAUJO", "ARAUJO VIDE", "RESTAURANTE", "RESTAURAÇÃO", "RESTAURACAO", "RESTAURACAO", "MALANDRINHO", "LEITARIA", "GELATARIA", "GELADOS", "GELADO"],

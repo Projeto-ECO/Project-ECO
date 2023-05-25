@@ -222,7 +222,7 @@ def statement(name):
         # Código GET aqui
         expenses, expenses_dic = get_expenses(id)
         profits, profits_dic = get_profits(id)
-        dic = {"Despesas": Decimal(expenses.split("€")[0]).quantize(Decimal('0.01')), "Lucros": Decimal(profits.split("€")[0]).quantize(Decimal('0.01'))}
+        dic = {"Despesas": Decimal(expenses.split("€")[0]).quantize(Decimal('0.01')), "Receitas": Decimal(profits.split("€")[0]).quantize(Decimal('0.01'))}
         image_base64 = get_pizza_info(dic, id, "statement")
         return render_template("statement.html", username=name, id=get_id_by_username(name), image_base64_profits_expenses=image_base64)
 
@@ -238,7 +238,7 @@ def download_economic_report(id):
         profits, profits_dic = get_profits(id)
         get_pizza_info(profits_dic, id, "profits") 
         get_pizza_info(expenses_dic, id, "expenses") 
-        dic_profits_expenses = {"Despesas": Decimal(expenses.split("€")[0]).quantize(Decimal('0.01')), "Lucros": Decimal(profits.split("€")[0]).quantize(Decimal('0.01'))}
+        dic_profits_expenses = {"Despesas": Decimal(expenses.split("€")[0]).quantize(Decimal('0.01')), "Receitas": Decimal(profits.split("€")[0]).quantize(Decimal('0.01'))}
         generate_economic_report(output, image_paths, id, dic_profits_expenses, expenses_dic, profits_dic)
         response = send_file(os.getcwd()+f"\\database/accounts\\{id}\\analysis\\economic_report.pdf", as_attachment=True)
         response.headers['Content-Disposition'] = f'attachment; filename=economic_report.pdf'
