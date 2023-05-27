@@ -216,7 +216,6 @@ def statement(name):
             ext = os.path.splitext(filename)[1].lower()
             if ext == ".xlsx" or ext == ".csv" or ext == ".xls":
                 store_statement(file, filename, ext, id)
-                return "Arquivo processado com sucesso."
             else:
                 return "Por favor, selecione um arquivo Excel ou CSV."
         # Código GET aqui
