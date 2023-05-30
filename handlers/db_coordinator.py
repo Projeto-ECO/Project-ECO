@@ -18,7 +18,7 @@ def read_json(filename):
         data = None
     else:
         # Read the file and load its content as JSON
-        with open(directory + filename) as file:
+        with open(directory + filename, encoding="utf8") as file:
             data = json.load(file)
 
     return data
