@@ -147,6 +147,59 @@ $(function() {
 });
 
 
+var loanButton = document.getElementById("loan-button");
+var modalLoan = document.getElementById("loan-modal");
+var closeButtonLoan = document.getElementsByClassName("close")[2];
+
+loanButton.onclick = function() {
+    modalLoan.style.display = "block";
+    // Get the calendar ID from the HTML and call loadEventsFromBackend
+    const calendarId = id_; // Replace 'loan-modal' with the actual ID of your calendar div
+    loadEventsFromBackend(calendarId);
+}
+
+closeButtonLoan.onclick = function() {
+    modalLoan.style.display = "none";
+}
+
+
+// Load events from the backend
+function loadEventsFromBackend(calendarId) {
+    fetch(`/calendar/${calendarId}`)
+    .then(response => response.json())
+    .then(eventsData => {
+        const events = [];
+        
+        // Convert the dictionary into an array of events
+        for (const date in eventsData) {
+            if (eventsData.hasOwnProperty(date)) {
+            const formattedDate = moment(date, 'DD-MM-YYYY').format('YYYY-MM-DD');
+            events.push({
+                title: eventsData[date],
+                start: formattedDate
+            });
+            }
+        }
+        
+        // Initialize FullCalendar with the loaded events
+        $(`#calendar`).fullCalendar({
+            events: events,
+            // Set other FullCalendar options and callbacks as needed
+            eventClick: function(event) {
+            const eventInfo = `
+                <h3>${event.title}</h3>
+                <p>${moment(event.start).format('DD-MM-YYYY')}</p>
+            `;
+            $('#event-info').html(eventInfo);
+            }
+        });
+    })
+    .catch(error => {
+        console.error('Failed to load events from the backend:', error);
+    });
+}
+
+
 function redirectToNewPage(username) {
     window.location.href = "/account/" + username;
 }

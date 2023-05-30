@@ -722,6 +722,8 @@ def create_user(username, password, email):
 
     # Write the initial coin data to the user's JSON file
     write_json("\\database\\accounts\\" + id + "\\" + id + ".json", json_coins)
+    # Write the initial bank loan data to the user's JSON file
+    write_json("\\database\\accounts\\" + id + "\\" + "loans.json", {})
 
     # Return the created user
     return id

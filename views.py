@@ -49,6 +49,12 @@ def go_to_home():
     return redirect(url_for("views.index"))
 
 
+@views.route("/calendar/<id>")
+def calendar(id):
+    dic = read_json("/database/accounts/"+id+"\\"+"loans.json")
+    return dic
+
+
 @views.route("/two-factor-auth-login/<username>", methods=["GET", "POST"])
 def two_factor_auth_login(username):
     code = session.get("code")
