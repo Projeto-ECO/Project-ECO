@@ -7,6 +7,7 @@
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/icons/carteira.ico') }}"/>
     <link rel="stylesheet" href="{{url_for('static', filename='css/portfolio.css')}}">
     <link rel="stylesheet" href="{{url_for('static', filename='css/home.css')}}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.css" />
     <title>ECO - Profile of {{name}}</title>
 </head>
     <body style="margin-top: 0%;">
@@ -131,6 +132,8 @@
     <script type="text/javascript">
         var id_ = "{{id}}";
     </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js"></script>
     <script type="text/javascript">searchUsers()</script>
     <script type="text/javascript">openChatWithUser({name})</script>
     <script type="text/javascript" src="{{url_for('static', filename='portfolio.js')}}"></script>
