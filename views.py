@@ -107,7 +107,8 @@ def login():
             session["code"] = code
             session["username"] = username
             session["id"] = get_id_by_username(username)
-            send_two_factor_auth_code(username, code, "login")
+            if not last_activity_check(session["id"]):
+                send_two_factor_auth_code(username, code, "login")
             return redirect(url_for("views.two_factor_auth_login", username = username))
     else:
         return render_template("login.html")
