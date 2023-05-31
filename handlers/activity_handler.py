@@ -23,13 +23,11 @@ def last_activity_check(id):
             last_activity = datetime.strptime(user["last_activity"], "%d-%m-%Y %H:%M:%S")
             now = datetime.now()
             difference = now - last_activity
-            
             # Print the time difference in seconds (for testing/debugging)
-            print(difference)
-            print(difference.total_seconds())
-            print(difference.total_seconds() > 600 and check_if_online(username))
             if difference.total_seconds() > 600 and check_if_online(username):  # 10 minutes
                 inactivate_user(id)
+                return False
+            elif not check_if_online(username):
                 return False
             else:
                 set_activity_timer(id)
