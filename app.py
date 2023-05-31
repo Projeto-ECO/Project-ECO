@@ -57,3 +57,8 @@ if __name__ == "__main__":
 # IP Público
 # 5.249.29.20:6070 - Desktop-Tiago
 # 5.249.29.20:7070 - Laptop-Tiago
+
+
+# Links
+# http://financialtipeco.online:5070/
+# http://www.financialtipeco.online:5070/
