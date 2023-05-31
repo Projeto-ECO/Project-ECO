@@ -1,8 +1,0 @@
-html
-json
-numpy
-matplotlib
-reportlab
-smtplib
-bleach
-shutil
