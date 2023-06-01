@@ -31,7 +31,6 @@ def write_json(file, data):
     # Check if the directory exists, create it if it doesn't
     if not os.path.exists(directory + file_dir):
         os.makedirs(directory + file_dir)
-        print("Created directory:", directory + file_dir)
 
     # Write the JSON data to the file with proper indentation
     with open(directory + file, "w+") as f:

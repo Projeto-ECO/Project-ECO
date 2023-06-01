@@ -18,7 +18,6 @@ def connect(auth):
         place += "/" + request.referrer.split("/")[-1]
         on_connect(auth, place)
         place = place.split("/")[-1]
-    print("Connect: ", place)
 
 
 
@@ -33,7 +32,6 @@ def disconnect():
     place = request.referrer.split("/")[-2]
     if place == "profile":
         place += "/" + request.referrer.split("/")[-1]
-    print("Disconnect: ", place)
     on_disconnect(place)
 
 

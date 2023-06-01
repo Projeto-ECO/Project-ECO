@@ -11,11 +11,10 @@ def convert_word(word):
         index = word.index("�")
         word1 = word[:index]
         word2 = word[index+1:]
-        with open("wordlist-big-latest.txt", "r") as f:
+        with open("resources/wordlist-big-latest.txt", "r") as f:
             for line in f:
                 if word1 in line and word2 in line:
                     word = line
-                    print(word)
                     return word
 
     # Lista de caracteres elegíveis e suas conversões

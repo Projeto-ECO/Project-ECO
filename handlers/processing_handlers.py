@@ -48,7 +48,6 @@ def send_email(to, subject, body):
 
 
 def send_two_factor_auth_code(to, code, op):
-    print("Sending two-factor auth code to:", to)
 
     # Determine the email address based on the operation type
     if op == "login":
@@ -1049,7 +1048,6 @@ def filter_operations(dic):
                 break
         else:
             # If no match is found, add the value to the "Outros" category
-            print(element)
             dic_operations["Outros"] += valor
 
     # Iterate over each element in the categorized operation dictionary

@@ -157,7 +157,6 @@ def signup():
             session["email_signup"] = email
             session["password_signup"] = password
             content = {"username": username, "email": email}
-            print(code)
             send_two_factor_auth_code(content, code, "signup")
             return redirect(url_for("views.two_factor_auth_signup"))
     else:
@@ -350,12 +349,7 @@ def chat_home(id):
             join = request.form.get("join", False)
             create = request.form.get("create", False)
 
-            with open("cenas.txt", "w+") as f:
-                    f.write("code-" + str(code) + " join-" + str(join) + " create-" + str(create))
-
             if join != False and not code:
-                with open("cenas.txt", "a+") as f:
-                    f.write("\nentrou")
                 username = get_username_by_id(id)
                 return render_template("chat_home.html", error="Please enter a room code.", code=code, name=id, username=username)
             
@@ -387,14 +381,11 @@ def chat_room(id):
         messages = get_room_messages(room)
         for element in messages:
             element["image"] = element["image"].replace("\\", "/")
-        print(messages)
         return render_template("chat_room.html", code=room, messages=messages, id=id, name=get_username_by_id(id))
 
 
 def new_message(data):
     room = session.get("room")
-    with(open("cenas.txt", "a+")) as f:
-        f.write("\nentrou-" + str(room) + " " + str(data))
     
     if check_room_code_exists(room) == False:
         return
@@ -410,7 +401,6 @@ def new_message(data):
     }
     send(content, to=room)
     add_room_message(room, content)
-    print(f"{name} said: {data['message']}")
 
 
 def on_connect(auth, place):
@@ -420,22 +410,15 @@ def on_connect(auth, place):
         session["username"] = name
         session["id"] = id
         activate_user(id)
-        print(f"{name} connected to profile")
         return
     elif "chat_room" in place:
         room = session.get("room")
         name = session.get("name")
-        print(f"{name} connected to room {room}")
-        if not room or not name:
-            print("Room or name not found")
-            return
+        if not room or not name: return
         if check_room_code_exists(room) == False:
-            print(f"Room {room} does not exist")
             leave_room(room)
             return
-        
         join_room(room)
-        print(f"{name} joined room {room}")
         send({"name": name, "id": get_id_by_username(name), "message": name+" has entered the room", "time": strftime("%d-%m-%Y %H:%M", localtime()), "image":get_image_path(get_id_by_username(name))}, to=room)
         add_room_member(room, name, get_id_by_username(name))
 
@@ -450,7 +433,6 @@ def on_disconnect(place):
     elif "chat_room" in place:
         room = session.get("room")
         name = session.get("name")
-        print(f"{name} disconnected from room {room}")
 
         if check_room_code_exists(room):
             data = read_json("\\database\\rooms.json")
@@ -462,14 +444,10 @@ def on_disconnect(place):
             room = session.get("room")
             time.sleep(5)
             if get_number_of_room_members(room) <= 0:
-                print(f"Room {room} has no members")
                 delete_room(room)
         send({"name": name, "id": get_id_by_username(name), "message": name+" has left the room", "time": strftime("%d-%m-%Y %H:%M", localtime()), "image":get_image_path(get_id_by_username(name))}, to=room)
-        print(f"{name} has left the room {room}")
         leave_room(room)
-    else:
-        print("Place not found - ", place)
-        return
+    else: return
 
 
 def inactivate_account(id):
