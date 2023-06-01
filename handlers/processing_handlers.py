@@ -873,12 +873,17 @@ def foreign_statement(bank, id):
     
     return lst
 
+def insert_char(string, char, index):
+    return string[:index] + char + string[index:]
 
 def calculate_bank_expenses(lst):
     dic = {}  # Dictionary to store expense totals for each description
     expenses = 0  # Total expenses
 
     for element in lst:
+        if "." in element[2] and len(element[2]) > 6:
+            element[2] = element[2].replace(".", "")
+            element[2] = insert_char(element[2], ".", -2)
         if element[2] != "" and float(element[2]) < 0:
             expense = round(float(element[2]) * -1, 2)  # Convert the expense amount to positive value
             expenses += expense  # Add the expense to the total expenses
@@ -897,6 +902,9 @@ def calculate_bank_profits(lst):
     profits = Decimal('0')  # Total profits
 
     for element in lst:
+        if "." in element[2] and len(element[2]) > 6:
+            element[2] = element[2].replace(".", "")
+            element[2] = insert_char(element[2], ".", -2)
         if element[2] != "" and float(element[2]) > 0:
             profit = Decimal(element[2]).quantize(Decimal('0.01'))  # Convert the profit amount to decimal with two decimal places
             profits += profit  # Add the profit to the total profits
