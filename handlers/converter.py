@@ -80,25 +80,28 @@ def clean_csv_file(filename):
 
 
 def convert_excel_to_csv(file_path):
-    # Verificar se o arquivo existe
-    if not os.path.exists(file_path):
-        raise ValueError(f"O arquivo {file_path} não existe")
+    try:
+        # Verificar se o arquivo existe
+        if not os.path.exists(file_path):
+            return None
 
-    # Obter extensão do arquivo
-    ext = os.path.splitext(file_path)[1]
+        # Obter extensão do arquivo
+        ext = os.path.splitext(file_path)[1]
 
-    # Converter arquivo Excel para CSV
-    if ext == ".xlsx" or ext == ".xls":
-        df = pd.read_excel(file_path)
-        csv_path = os.path.splitext(file_path)[0] + ".csv"
-        df.to_csv(csv_path, index=None, header=True, quoting=csv.QUOTE_NONE, escapechar="\\", sep=";")
+        # Converter arquivo Excel para CSV
+        if ext == ".xlsx" or ext == ".xls":
+            df = pd.read_excel(file_path)
+            csv_path = os.path.splitext(file_path)[0] + ".csv"
+            df.to_csv(csv_path, index=None, header=True, quoting=csv.QUOTE_NONE, escapechar="\\", sep=";")
 
-        return csv_path
+            return csv_path
 
-    # Arquivo já é CSV
-    elif ext == ".csv":
-        return file_path
+        # Arquivo já é CSV
+        elif ext == ".csv":
+            return file_path
 
-    # Arquivo não suportado
-    else:
-        raise ValueError("O arquivo deve ser Excel ou CSV")
+        # Arquivo não suportado
+        else:
+            return None
+    except:
+        return None

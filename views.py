@@ -221,7 +221,9 @@ def statement(name):
             # Verificar se o arquivo é Excel ou CSV
             ext = os.path.splitext(filename)[1].lower()
             if ext == ".xlsx" or ext == ".csv" or ext == ".xls":
-                store_statement(file, filename, ext, id)
+                store_status = store_statement(file, filename, ext, id)
+                if not store_status:
+                    return "Erro ao armazenar arquivo...Só são aceites extratos do Santander e Caixa Geral de Depósitos."
             else:
                 return "Por favor, selecione um arquivo Excel ou CSV."
         # Código GET aqui

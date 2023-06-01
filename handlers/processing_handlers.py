@@ -742,8 +742,10 @@ def store_statement(file, filename, ext, id):
     # Read the file as Excel or CSV
     if ext == ".xlsx" or ext == ".xls":
         # Convert Excel to CSV
-        convert_excel_to_csv(file_path)
+        convert_status = convert_excel_to_csv(file_path)
         os.remove(file_path)
+        if convert_status == None:
+            return False
         file_path = os.path.splitext(file_path)[0] + ".csv"
     
     # Clean the CSV file
@@ -751,6 +753,10 @@ def store_statement(file, filename, ext, id):
     
     # Identify the bank from the statement
     bank = get_statement_bank(file_path)
+    if bank != "Santander" and bank != "CGD":
+        # Remove the file
+        os.remove(file_path)
+        return False
     
     # Extract statement data
     lst = get_statement_data(file_path)
