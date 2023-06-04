@@ -9,6 +9,7 @@ This repository contains the entire Project ECO. It is part of the larger initia
 ## Project Members
 
 **AS - Grupo 105**
+
 The development of this project was led by the following team members:
 
 - Filipe Sousa (76639)
