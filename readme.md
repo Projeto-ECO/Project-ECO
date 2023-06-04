@@ -21,20 +21,15 @@ To access the full project, including all its resources and code, please visit t
 
 ## Installation
 
-
 To install the platform, follow these simple steps:
 
 1. Download the code from the repository.
-2. Install the required dependencies listed in the `requirements.md` file.
+2. Install the required dependencies listed in the [requirements.md](https://github.com/Projeto-ECO/Project-ECO/blob/main/requirements.md) file.
 3. Ensure that you have Python version 3.10.5 or a higher version installed.
 
 ## Usage
 
 [Explain how to use the project or any specific instructions for users]
-
-## Contributions
-
-We welcome contributions to the Project ECO! If you would like to contribute, please follow the guidelines outlined in our [CONTRIBUTING.md](CONTRIBUTING.md) file.
 
 ## Issues
 
