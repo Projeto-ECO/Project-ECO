@@ -31,9 +31,13 @@ To install the platform, follow these simple steps:
 
 [Explain how to use the project or any specific instructions for users]
 
-## Issues
+## Issues and Support
 
-If you encounter any issues with the project or have any suggestions for improvement, please open an issue on our [issue tracker](https://github.com/orgs/Projeto-ECO/issues).
+If you encounter any issues with the project or have suggestions for improvement, please open an issue on our [issue tracker](https://github.com/orgs/Projeto-ECO/issues).
+
+Please note that as we do not use a production server to host the platform, there may be instances where the environment abruptly stops. In such cases, you will be unable to access the platform until the environment is restarted. We apologize for any inconvenience caused and kindly request you to contact us using the information below. Our team will promptly address the issue and ensure your access to the platform is restored.
+
+For support and issue resolution, please reach out using the information in the **Contact** header.
 
 ## License
 
@@ -41,4 +45,9 @@ This project is licensed under the [MIT License](LICENSE).
 
 ## Contact
 
-For any further information or inquiries, please contact us at [email@example.com](mailto:email@example.com).
+For any inquiries, support, or assistance regarding the platform, please don't hesitate to reach out to us using the following contact details:
+
+* Email: [t.fonseca@ua.pt](mailto:t.fonseca@ua.pt)
+* Phone: +351 930586812
+
+We are here to help and will respond to your queries as soon as possible.
