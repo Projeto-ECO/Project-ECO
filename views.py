@@ -16,6 +16,34 @@ def index():
     return render_template("index.html")
 
 
+
+@views.route('/dados_saldo/<id>')
+def get_dados_saldo(id):
+    if last_activity_check(id):
+        dic = get_date_balance(id)
+        dados = []
+        for data, saldo in dic.items():
+            dados.append({
+                'data': data,
+                'saldo': saldo
+            })
+
+        return jsonify(dados)
+    else:
+        return redirect(url_for("views.index"))
+    
+
+@views.route('/save-graphic/<id>', methods=['POST'])
+def save_graphic(id):
+    if last_activity_check(id):
+        image_url = request.json.get('imageUrl')
+        save_image(image_url, id)
+        return jsonify({'status': 'success'})
+    else:
+        return redirect(url_for("views.index"))
+
+
+
 @views.route("/profile/<username>")
 def profile(username):
     if not username:
@@ -223,15 +251,19 @@ def statement(name):
             if ext == ".xlsx" or ext == ".csv" or ext == ".xls":
                 store_status = store_statement(file, filename, ext, id)
                 if not store_status:
-                    return "Erro ao armazenar arquivo...Só são aceites extratos do Santander e Caixa Geral de Depósitos."
+                    return jsonify({"status": "error", "message": "Erro ao armazenar arquivo. Só são aceites extratos do Santander e Caixa Geral de Depósitos."})
             else:
-                return "Por favor, selecione um arquivo Excel ou CSV."
-        # Código GET aqui
+                return jsonify({"status": "error", "message": "Por favor, selecione um arquivo Excel ou CSV."})
+            # Return a success response
+            return jsonify({"status": "success", "message": "Arquivo submetido com sucesso!"})
+
+        # Code for GET request here
         expenses, expenses_dic = get_expenses(id)
         profits, profits_dic = get_profits(id)
         dic = {"Despesas": Decimal(expenses.split("€")[0]).quantize(Decimal('0.01')), "Receitas": Decimal(profits.split("€")[0]).quantize(Decimal('0.01'))}
         image_base64 = get_pizza_info(dic, id, "statement")
         return render_template("statement.html", username=name, id=get_id_by_username(name), image_base64_profits_expenses=image_base64)
+
 
 @views.route("/download_economic_report/<id>")
 def download_economic_report(id):
@@ -240,12 +272,18 @@ def download_economic_report(id):
     else:
         set_activity_timer(id)
         output = os.getcwd()+f"\\database/accounts\\{id}\\analysis\\economic_report.pdf"
-        image_paths = [os.getcwd()+f"\\database/accounts\\{id}\\analysis\\expenses.png", os.getcwd()+f"\\database/accounts\\{id}\\analysis\\profits.png", os.getcwd()+f"\\database/accounts\\{id}\\analysis\\statement.png"]
+        chart_dir = os.getcwd()+f"\\database\\accounts\\{id}\\analysis\\ECO_chart.png"
+        if not os.path.exists(chart_dir):
+            chart_dir = None
+        image_paths = [os.getcwd()+f"\\database/accounts\\{id}\\analysis\\expenses.png", os.getcwd()+f"\\database/accounts\\{id}\\analysis\\profits.png", os.getcwd()+f"\\database/accounts\\{id}\\analysis\\statement.png", chart_dir]
         expenses, expenses_dic = get_expenses(id)
         profits, profits_dic = get_profits(id)
         get_pizza_info(profits_dic, id, "profits") 
         get_pizza_info(expenses_dic, id, "expenses") 
         dic_profits_expenses = {"Despesas": Decimal(expenses.split("€")[0]).quantize(Decimal('0.01')), "Receitas": Decimal(profits.split("€")[0]).quantize(Decimal('0.01'))}
+        chart_dir = os.getcwd()+f"\\database\\accounts\\{id}\\analysis\\ECO_chart.png"
+        if not os.path.exists(chart_dir):
+            chart_dir = None
         generate_economic_report(output, image_paths, id, dic_profits_expenses, expenses_dic, profits_dic)
         response = send_file(os.getcwd()+f"\\database/accounts\\{id}\\analysis\\economic_report.pdf", as_attachment=True)
         response.headers['Content-Disposition'] = f'attachment; filename=economic_report.pdf'
@@ -259,7 +297,8 @@ def expenses(id):
     else:
         expenses, expenses_dic = get_expenses(id)
         image_base64 = get_pizza_info(expenses_dic, id, "expenses")
-        return render_template('expenses.html', expenses=expenses, expenses_dic=expenses_dic, image_base64=image_base64, id=id)
+        name = search_user_by_id(id)["username"]
+        return render_template('expenses.html', expenses=expenses, expenses_dic=expenses_dic, image_base64=image_base64, id=id, username = name)
 
 
 @views.route('/profits/<id>')
@@ -269,7 +308,8 @@ def profits(id):
     else:
         profits, profits_dic = get_profits(id)
         image_base64 = get_pizza_info(profits_dic, id, "profits")
-        return render_template('profits.html', profits=profits, profits_dic=profits_dic, image_base64_profits=image_base64, id=id)
+        name = search_user_by_id(id)["username"]
+        return render_template('profits.html', profits=profits, profits_dic=profits_dic, image_base64_profits=image_base64, id=id, username = name)
 
 
 @views.route("/account/<username>")

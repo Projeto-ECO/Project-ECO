@@ -1,7 +1,7 @@
 import csv
 from handlers.db_coordinator import *
 from handlers.processing_handlers import *
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 def banking_operations(id, operation, coin, amount):
@@ -106,3 +106,16 @@ def get_account_balance(id):
 
     # Return the total account balance
     return total
+
+
+def get_date_balance(id):
+    
+    with open(os.getcwd() + f"\\database\\accounts\\{id}\\{id}.csv", "r") as file:
+        csv_reader = csv.reader(file, delimiter=";")
+        data = list(csv_reader)
+        data.pop(0)
+        date = data[-1][0]
+        dic = {}
+        for row in data[::-1]:
+            dic[row[0]] = row[3]
+        return dic

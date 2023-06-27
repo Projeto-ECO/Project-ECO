@@ -13,7 +13,7 @@
 
 .wrapper {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
     align-items: center;
     margin-top: 7%;
     margin-bottom: 7%;
@@ -50,9 +50,28 @@
 }
 
 .graph-wrapper {
-    flex-basis: 20%;
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.graph-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.graph-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.graph-container canvas {
+    margin: 10px;
+    max-width: 600px; /* Adjust the value as needed */
+    max-height: 400px; /* Adjust the value as needed */
+    border-radius: 10%;
 }
 
 .file-input {
@@ -86,4 +105,69 @@ label {
     border-radius: 10px;
     margin-top: 5px;
     font-size: 9px;
+}
+
+canvas {
+    max-width: 800px;
+    max-height: 700px;
+}
+
+
+.menu-wrapper {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    z-index: 9999;
+}
+
+.menu-icon {
+    border-radius: 50%;
+    padding: 10px;
+    cursor: pointer;
+    position: relative; /* Change 'absolute' to 'relative' */
+    width: 85px; /* Set the width to accommodate the SVG image */
+    height: 85px; /* Set the height to accommodate the SVG image */
+}
+
+.menu-icon img {
+    width: 100%; /* Make the SVG image fill the menu icon */
+    height: 100%;
+    object-fit: contain;
+}
+
+
+.menu-options {
+    display: none;
+    flex-direction: column;
+    background-color: #f1f1f1;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    position: absolute;
+    bottom: 60px; /* Adjust the value as needed */
+    right: 0;
+    width: 200px;
+}
+
+.menu-wrapper:hover .menu-options {
+    display: flex;
+}
+
+
+.menu-options a {
+    display: block;
+    padding: 5px 10px;
+    text-decoration: none;
+    color: #333;
+}
+
+.menu-options a:hover {
+    background-color: #ddd;
+}
+
+.white-icon {
+    filter: invert(1);
 }

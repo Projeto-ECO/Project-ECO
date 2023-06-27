@@ -8,6 +8,7 @@ import shutil
 import bleach
 import matplotlib.pyplot as plt
 import numpy as np
+import base64
 from handlers.converter import *
 from handlers.db_coordinator import *
 from decimal import Decimal
@@ -1124,6 +1125,8 @@ def get_pizza_info(dic, id, page):
 
 
 def generate_economic_report(output_path, image_paths, id, dic_profits_expenses, expenses_dic, profits_dic):
+    if image_paths[-1] == None:
+        image_paths.pop(-1)
 
     image_paths = image_paths[::-1]
 
@@ -1205,7 +1208,7 @@ def generate_economic_report(output_path, image_paths, id, dic_profits_expenses,
     elements.append(datetime_para)
 
     # PAGINAS SEGINTES
-    dic_names = {"Expenses": "Despesas", "Profits": "Receitas", "Statement": "Geral"}
+    dic_names = {"Expenses": "Despesas", "Profits": "Receitas", "Statement": "Geral", "Eco_Chart": "Saldo Eco"}
     # Create the logo image objects with colored background
     for path in image_paths:
         name = os.path.splitext(os.path.basename(path))[0].title()
@@ -1304,3 +1307,24 @@ def generate_economic_report(output_path, image_paths, id, dic_profits_expenses,
 
     doc.build(elements)
     return True
+
+
+def save_image(image_data_url, id):
+    # Remove the "data:image/png;base64," prefix from the data URL
+    base64_data = image_data_url.split(',')[1]
+
+    # Decode the base64 image data
+    image_data = base64.b64decode(base64_data)
+
+    # Specify the directory to save the image
+    save_directory = os.path.join(os.getcwd(), 'database', 'accounts', id, "analysis")
+
+    # Create the directory if it doesn't exist
+    os.makedirs(save_directory, exist_ok=True)
+
+    # Generate a unique filename for the image (e.g., using a timestamp)
+    filename = 'ECO_chart.png'  # Replace with your preferred filename logic
+
+    # Save the image to the specified directory
+    with open(os.path.join(save_directory, filename), 'wb') as f:
+        f.write(image_data)

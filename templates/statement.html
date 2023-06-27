@@ -8,6 +8,7 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/statement.css') }}">
     <link rel="stylesheet" href="{{url_for('static', filename='css/portfolio.css')}}">
     <link rel="stylesheet" href="{{url_for('static', filename='css/home.css')}}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <title>ECO - Extrato</title>
 </head>
 <body style="margin-top: 2%;">
@@ -26,33 +27,31 @@
     </div>
     <div class="wrapper">
         <div class="table-wrapper">
-            <form action="/statement/{{username}}" method="post" enctype="multipart/form-data">
-                <a>Selecione um arquivo Excel ou CSV:</a>
-                <br>
-                <label for="file" id="file-label">Upload</label>
-                <input type="file" name="file" id="file" accept=".csv, .xls, .xlsx" class="file-input" onchange="previewFile()">
-                <br>
-                <img src="" id="file-icon" style="margin-top: 15px;">
-                <div id="preview"></div>
-                <br>
-                <input type="submit" value="Submeter" style="background: rgb(77, 155, 75); border-color: transparent; cursor: pointer;">
-            </form>
-            <br>
-            <a href="/download_pdf/{{id}}">Baixar Extrato ECO</a>
-            <br>
-            <br>
-            <a href="/download_economic_report/{{id}}">Baixar Relatório Económico</a>
-            <br>
-            <br>
-            <a href="/expenses/{{id}}">Ver Despesas</a>
-            <br>
-            <br>
-            <a href="/profits/{{id}}">Ver Receitas</a>
+            <div class="menu-wrapper">
+                <div class="menu-icon">
+                    <div class="menu-icon">
+                        <img src="{{ url_for('static', filename='images/icons/menu-icon.png') }}" alt="Menu Icon" class="white-icon">
+                    </div>                                        
+                </div>
+                <div class="menu-options">
+                    <a onclick="openPopup()">Upload</a>
+                    <a href="/download_pdf/{{id}}">Baixar Extrato ECO</a>
+                    <a href="/download_economic_report/{{id}}">Baixar Relatório Económico</a>
+                    <a href="/expenses/{{id}}">Ver Despesas</a>
+                    <a href="/profits/{{id}}">Ver Receitas</a>
+                </div>
+            </div>
         </div>
-        <div class="graph-wrapper">
-            <img src="{{ url_for('views.get_image', filename='database/accounts/' + id + '/' + 'analysis' + '/' + 'statement.png') }}" style="border-radius: 10%;">
+        <div class="graph-container">
+            <div class="graph-wrapper">
+                <img src="{{ url_for('views.get_image', filename='database/accounts/' + id + '/' + 'analysis' + '/' + 'statement.png') }}">
+            </div>
+            <canvas id="grafico-saldo"></canvas>
         </div>
     </div>
+    <script>
+        var id = "{{id}}";
+    </script>
     <script type="text/javascript" src="{{url_for('static', filename='statement.js')}}"></script>
 </body>
 </html>
